@@ -1,0 +1,13 @@
+mkdir obj obj/Debug obj/Debug/src
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./main.cpp" -o obj/Debug/main.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/Cliente.cpp" -o obj/Debug/src/Cliente.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/Fuente.cpp" -o obj/Debug/src/Fuente.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/FuncionesPantalla.cpp" -o obj/Debug/src/FuncionesPantalla.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/PantallaConfiguracion.cpp" -o obj/Debug/src/PantallaConfiguracion.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/PantallaInicio.cpp" -o obj/Debug/src/PantallaInicio.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/PantallaJuego.cpp" -o obj/Debug/src/PantallaJuego.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/Principal.cpp" -o obj/Debug/src/Principal.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/stringConvert.cpp" -o obj/Debug/src/stringConvert.o
+g++ -Wall -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT -g -Iinclude -c "./src/Tablero.cpp" -o obj/Debug/src/Tablero.o
+g++  -o ClienteReversi obj/Debug/main.o obj/Debug/src/Cliente.o obj/Debug/src/Fuente.o obj/Debug/src/FuncionesPantalla.o obj/Debug/src/PantallaConfiguracion.o obj/Debug/src/PantallaInicio.o obj/Debug/src/PantallaJuego.o obj/Debug/src/Principal.o obj/Debug/src/stringConvert.o obj/Debug/src/Tablero.o  -L/usr/lib/i386-linux-gnu -lSDL -lSDL_ttf -lSDL -lSDL_image -lSDL -lSDL_ttf -lSDL_image
+ 

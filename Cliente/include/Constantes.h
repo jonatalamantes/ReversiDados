@@ -1,0 +1,3 @@
+#define TAM_CUADRO 40
+#define TAM_LINEA 3
+#define MAX_CHAR_TEXTBOX 16

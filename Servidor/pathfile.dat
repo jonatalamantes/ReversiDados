@@ -1,0 +1,8 @@
+mkdir obj obj/Debug obj/Debug/src
+g++ -Wall -fexceptions -g -Iinclude -c "./main.cpp" -o obj/Debug/main.o
+g++ -Wall -fexceptions -g -Iinclude -c "./src/EstructuraHilo.cpp" -o obj/Debug/src/EstructuraHilo.o
+g++ -Wall -fexceptions -g -Iinclude -c "./src/Partida.cpp" -o obj/Debug/src/Partida.o
+g++ -Wall -fexceptions -g -Iinclude -c "./src/Servidor.cpp" -o obj/Debug/src/Servidor.o
+g++ -Wall -fexceptions -g -Iinclude -c "./src/stringConvert.cpp" -o obj/Debug/src/stringConvert.o
+g++ -Wall -fexceptions -g -Iinclude -c "./src/Tablero.cpp" -o obj/Debug/src/Tablero.o
+g++  -o ServidorReversi obj/Debug/main.o obj/Debug/src/EstructuraHilo.o obj/Debug/src/Partida.o obj/Debug/src/Servidor.o obj/Debug/src/stringConvert.o obj/Debug/src/Tablero.o
