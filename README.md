@@ -1,5 +1,5 @@
 # Reversi Dados
-ReversiDados es la implementación del popular juego de Reversi sólo que con la variante de tirar unos dados para seleccionar la fila/columna donde ingresar las fichas.
+ReversiDados es la implementación del popular juego de Reversi sólo que con la variante de tirar unos dados para seleccionar la fila/columna donde ingresar las fichas con soporte en red.
 
 #Compilación
 La compilación se puede hacer desde el archivo llamado "pathfile.dat" el cual utiliza el compilador g++, así como también necesita tener instaladas las librerias de desarrollo de SDL, SDL_image y SDL_ttf en su versión 1.2.
