@@ -3,22 +3,28 @@
 
 #include "Partida.h"
 
+/**
+* Clase para el almacenamiento de una partida en red
+*
+* @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+**/
 class EstructuraHilo
 {
     private:
+        ///Atributos
         Partida* partida;
         int descriptorSocket;
 
     public:
-        //Constructor
+        ///Constructor
             EstructuraHilo();
             ~EstructuraHilo();
 
-        //Getters
+        ///Getters
             Partida* getPartida();
             int getDescriptorSocket();
 
-        //Setters
+        ///Setters
             void setPartida(Partida* x);
             void setDescriptorSocket(int x);
 };

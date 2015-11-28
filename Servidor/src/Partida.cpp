@@ -1,10 +1,8 @@
 #include "Partida.h"
 
-//Constructor
+///Constructor
 Partida::Partida()
 {
-    jugador1 = "";
-    jugador2 = "";
     nombreJ1 = "";
     nombreJ2 = "";
     descriptorJ1 = 0;
@@ -16,17 +14,12 @@ Partida::Partida()
     tablero = new Tablero();
 }
 
-//Getters
-string Partida::getJugador1()
+Partida::~Partida()
 {
-    return Partida::jugador1;
+    delete tablero;
 }
 
-string Partida::getJugador2()
-{
-    return Partida::jugador2;
-}
-
+///Getters
 Tablero* Partida::getTablero()
 {
     return Partida::tablero;
@@ -77,17 +70,7 @@ bool Partida::getFinalizada()
     return Partida::finalizada;
 }
 
-//Setters
-void Partida::setJugador1(string x)
-{
-    Partida::jugador1 = x;
-}
-
-void Partida::setJugador2(string x)
-{
-    Partida::jugador2 = x;
-}
-
+///Setters
 void Partida::setTablero(Tablero* x)
 {
     Partida::tablero = x;

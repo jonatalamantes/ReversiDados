@@ -1,5 +1,6 @@
 #include "EstructuraHilo.h"
 
+///Constructor
 EstructuraHilo::EstructuraHilo()
 {
     partida = NULL;
@@ -11,7 +12,7 @@ EstructuraHilo::~EstructuraHilo()
     partida = NULL;
 }
 
-//Getters
+///Getters
 Partida* EstructuraHilo::getPartida()
 {
     return EstructuraHilo::partida;
@@ -22,7 +23,7 @@ int EstructuraHilo::getDescriptorSocket()
     return EstructuraHilo::descriptorSocket;
 }
 
-//Setters
+///Setters
 void EstructuraHilo::setPartida(Partida* x)
 {
     EstructuraHilo::partida = x;
