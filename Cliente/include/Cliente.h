@@ -21,6 +21,11 @@
 
 #include "Tablero.h"
 
+/**
+ * Estructura que encapsula los datos del paquete quiero jugar
+ *
+ * @author Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 struct quieroJugar
 {
     uint16_t RV;
@@ -28,6 +33,11 @@ struct quieroJugar
     std::string nombre;
 };
 
+/**
+ * Estructura que encapsula los datos del paquete de los movimientos por jugador
+ *
+ * @author Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 struct moviento
 {
     uint16_t RV;
@@ -35,6 +45,11 @@ struct moviento
     uint8_t xy;
 };
 
+/**
+ * Estructura que encapsula los datos del paquete para pedir los dados
+ *
+ * @author Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 struct pidoDado
 {
     uint16_t RV;
@@ -42,9 +57,15 @@ struct pidoDado
     uint8_t color;
 };
 
+/**
+ * Clase con los datos de un cliente del juego
+ *
+ * @author Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 class Cliente
 {
     private:
+    ///Atributos
         quieroJugar qJ;
         moviento m;
         pidoDado pD;
@@ -55,22 +76,22 @@ class Cliente
         struct sockaddr_in serv;
         struct sockaddr_in clien;
         socklen_t sin_size;
-
     public:
+    ///Constructor
         Cliente();
-        bool conectar(std::string host,std::string puerto);
-        bool enviarBusquedaDeJuego();
-        bool mandarMoviento();
-        bool pedirDado();
+    ///Metodos
         void recibirMoviento();
-        int recibirPaquete(char buffer[255]);
         void analizarMensaje();
         void armarPaqueteBuscar(std::string nombre);
         void armarPaqueteMovimiento(int x,int y);
         void armarPaquetePedirDado(int colorFicha);
         void recibirPaquete();
         void enviarPaqueteFin(int color);
-
+        bool conectar(std::string host,std::string puerto);
+        bool enviarBusquedaDeJuego();
+        bool mandarMoviento();
+        bool pedirDado();
+        int recibirPaquete(char buffer[255]);
         int getSock();
 };
 

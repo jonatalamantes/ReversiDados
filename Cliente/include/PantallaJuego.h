@@ -7,6 +7,12 @@
 #include "Tablero.h"
 #include "Cliente.h"
 
+/**
+* Clase con los del manejo de la pantalla del Cliente
+*
+* @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+* @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+**/
 class PantallaJuego
 {
     private:

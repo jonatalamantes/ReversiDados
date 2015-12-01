@@ -638,6 +638,11 @@ void PantallaJuego::dibujarReversiChan(int estado)
     }
 }
 
+/**
+ * @param pc    Puntero hacia el objeto encargado de manejar los enventos en pantalla
+ *
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>     
+ */
 void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
 {
     Cliente *cl = new Cliente();
@@ -832,6 +837,11 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
     }
 }
 
+/**
+ * @param clrev    Puntero hacia el objeto con los datos del cliente
+ *
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>     
+ */
 void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 {
     SDL_Event Evento;

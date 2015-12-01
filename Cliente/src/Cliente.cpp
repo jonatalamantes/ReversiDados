@@ -1,6 +1,3 @@
-#include "Cliente.h"
-#include "List.h"
-
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -13,19 +10,28 @@
 #include <netdb.h>
 #include <sys/socket.h>
 
+#include "Cliente.h"
+#include "List.h"
+
 using namespace std;
 
+///Constructor
 Cliente::Cliente()
 {
     memset(&serv,0,sizeof(serv));
     memset(&clien,0,sizeof(clien));
-    //memset(&qJ,0,sizeof(qJ));
-    //memset(&m,0,sizeof(m));
-    //memset(&pD,0,sizeof(pD));
     sin_size=sizeof(struct sockaddr);
     sock = 0;
 }
 
+/**
+ * Devuelve el resultado de la conexión, ya sea si esta fue exitosa o no
+ * 
+ * @param   host    Recibe una cadeba con el nombre o IP del host donde se hospeda el servidor
+ * @param   puerto  Recibe una cadeba con el número de puerto donde se hospeda el servidor
+ * @return          Si se logro la conexión
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 bool Cliente::conectar(std::string host, std::string puerto)
 {
     int errores;
@@ -41,26 +47,31 @@ bool Cliente::conectar(std::string host, std::string puerto)
     if (errores<0)
     {
         perror("Error: getaddrinfo");
-        return false;//Cambiar por un aviso grafico.
+        return false;
     }
 
     Cliente::sock=socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (Cliente::sock<0)
     {
         perror("Error: socket");
-        return false;//Cambiar por un aviso grafico.
+        return false;
     }
     errores=connect(Cliente::sock, res->ai_addr, res->ai_addrlen);
     if (errores<0)
     {
         perror("Error: connect");
-        return false;//Cambiar por un aviso grafico.
+        return false;
     }
     else
         return true;
 }
 
-
+/**
+ * Arma el paquete a ser enviado para buscar una partida
+ * 
+ * @param   nombreJ Cadena de caracteres con el nombre del jugador
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 void Cliente::armarPaqueteBuscar(std::string nombreJ)
 {
     /*Variable para copiar los datos de la estructura*/
@@ -84,6 +95,12 @@ void Cliente::armarPaqueteBuscar(std::string nombreJ)
     }
 }
 
+/**
+ * Devuelve el resultado del envío del paquete de busqueda de un juego 
+ * 
+ * @return          Si se ha enviado el paquete correctamente
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 bool Cliente::enviarBusquedaDeJuego()
 {
     int errores;
@@ -97,6 +114,13 @@ bool Cliente::enviarBusquedaDeJuego()
         return true;
 }
 
+/**
+ * Arma el paquete a ser enviado por cada movimiento del jugador
+ * 
+ * @param   x   Coordenada x del movimiento que fue realizado por el jugador
+ * @param   y   Coordenada y del movimiento que fue realizado por el jugador
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 void Cliente::armarPaqueteMovimiento(int x,int y)
 {
     /*Variable para copiar los datos de la estructura*/
@@ -120,6 +144,12 @@ void Cliente::armarPaqueteMovimiento(int x,int y)
     memcpy(Cliente::paqueteMovimiento+3, &Cliente::m.xy, 1);
 }
 
+/**
+ * Devuelve el resultado del envío del paquete que contiene el movimiento realizado por el jugador
+ * 
+ * @return          Si se ha enviado el paquete correctamente
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 bool Cliente::mandarMoviento()
 {
     int errores;
@@ -133,6 +163,12 @@ bool Cliente::mandarMoviento()
         return true;
 }
 
+/**
+ * Arma el paquete a ser enviado por cada peticíón un dado por parte del jugador
+ * 
+ * @param   colorFicha  Color de la ficha correspondiente al jugador que realiza la petición
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 void Cliente::armarPaquetePedirDado(int colorFicha)
 {
     /*Variable para copiar los datos de la estructura*/
@@ -153,6 +189,12 @@ void Cliente::armarPaquetePedirDado(int colorFicha)
     memcpy(Cliente::paqueteDado+3, &u8, 1);
 }
 
+/**
+ * Devuelve el resultado del envío del paquete de solicitud de dado
+ * 
+ * @return          Si se ha enviado el paquete correctamente
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 bool Cliente::pedirDado()
 {
     int errores;
@@ -166,6 +208,13 @@ bool Cliente::pedirDado()
         return true;
 }
 
+/**
+ * Devuelve el tipo de paquete que ha sido recibido
+ *
+ * @param   buffer  Mensaje que ha sido recibido para su análisis
+ * @return          Tipo de mensaje recibido
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 int Cliente::recibirPaquete(char buffer[255])
 {
     if(buffer[0]!='R')
@@ -205,6 +254,12 @@ int Cliente::recibirPaquete(char buffer[255])
     }
 }
 
+/**
+ * Envia el paquete que indica el final de la partida
+ *
+ * @param   color   El color de ficha del jugador que envia el paquete
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
+ */
 void Cliente::enviarPaqueteFin(int color)
 {
     List<uint8_t> bytesEnviados;
@@ -247,6 +302,7 @@ void Cliente::enviarPaqueteFin(int color)
     delete [] bufferPaquete;
 }
 
+/// Getter
 int Cliente::getSock()
 {
     return Cliente::sock;
