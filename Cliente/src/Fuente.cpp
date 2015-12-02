@@ -1,6 +1,6 @@
 #include "Fuente.h"
 
-//Constructor
+///Constructor
 Fuente::Fuente()
 {
     Fuente::puntero = NULL;
@@ -15,13 +15,13 @@ Fuente::Fuente(TTF_Font* p, string n, int t)
     Fuente::nombre = n;
 }
 
-//Destructor
+///Destructor
 Fuente::~Fuente()
 {
     Fuente::puntero = NULL;
 }
 
-//Getters
+///Getters
 TTF_Font* Fuente::getPuntero()
 {
     return Fuente::puntero;
@@ -37,7 +37,7 @@ int Fuente::getTam()
     return Fuente::tam;
 }
 
-//Setters
+///Setters
 void Fuente::setPuntero(TTF_Font* f)
 {
     Fuente::puntero = f;
@@ -53,7 +53,7 @@ void Fuente::setTam(int t)
     Fuente::tam = t;
 }
 
-//Sobrecarga de operadores
+///Sobrecarga de operadores
 bool Fuente::operator== (Fuente f)
 {
     if (this->getNombre() == f.getNombre()  &&
@@ -65,5 +65,4 @@ bool Fuente::operator== (Fuente f)
     {
         return false;
     }
-
 }

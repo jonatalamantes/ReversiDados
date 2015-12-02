@@ -1,5 +1,6 @@
 #include "Tablero.h"
 
+///Constructores
 Tablero::Tablero()
 {
     memset (fichas, 0, sizeof(fichas));
@@ -23,27 +24,39 @@ Tablero::Tablero(const Tablero& t)
 
 Tablero::Tablero(short int fichas[8][8],unsigned short int dados[3])
 {
-    for(int i=0;i<8;i++)
-    {
-        for(int j=0;j<8;j++)
+    for(int i = 0; i < 8; i++)
+    { 
+        for(int j = 0; j < 8;j++)
         {
-            if(i==4 && j ==4)
-                fichas[i][j]=-1;
-            else if(i==4 && j==5)
-                fichas[i][j]=1;
-            else if(i==5 && j==4)
-                fichas[i][j]=1;
-            else if(i==5 && j==5)
-                fichas[i][j]=-1;
+            if (i == 4 && j == 4)
+            {
+                fichas[i][j] = -1;
+            } 
+            else if (i == 4 && j == 5)
+            {
+                fichas[i][j] = 1;
+            }
+            else if (i == 5 && j == 4)
+            {
+                fichas[i][j] = 1;
+            }
+            else if (i == 5 && j == 5)
+            {
+                fichas[i][j] = -1;
+            }
             else
-                fichas[i][j]=0;
+            {
+                fichas[i][j] = 0;
+            }
         }
     }
+
     dados[0]=0;
     dados[1]=0;
     dados[2]=0;
 }
 
+///Getters
 short int Tablero::getFicha(short int x, short int y) const
 {
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
@@ -68,6 +81,7 @@ unsigned short int Tablero::getDado(short int p) const
     }
 }
 
+//Setters
 void Tablero::setFicha(short int x, short int y, short int colorf)
 {
     if (!(x < 0 || x >= 8 || y < 0 || y >= 8))
@@ -84,12 +98,73 @@ void Tablero::setDado(short int p, unsigned short int val)
     }
 }
 
+/**
+ * Subturina que establece los datos del tablero en vacios
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::inicializar()
 {
     memset (fichas, 0, sizeof(fichas));
     memset (dados, 0, sizeof(dados));
 }
 
+/**
+ * Devuelve la cantidad de fichas negras en el tablero
+ * 
+ * @return   La cantidad de fichas negras
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+short Tablero::cantidadNegras()
+{
+    short cantidad = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (Tablero::fichas[i][j] == 1)
+            {
+                cantidad++;
+            }
+        }
+    }
+
+    return cantidad;
+}
+
+/**
+ * Devuelve la cantidad de fichas blancas en el tablero
+ * 
+ * @return   La cantidad de fichas blancas
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+short Tablero::cantidadBlancas()
+{
+    short cantidad = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (Tablero::fichas[i][j] == -1)
+            {
+                cantidad++;
+            }
+        }
+    }
+
+    return cantidad;
+}
+
+/**
+ * Pequeña forma de jugar contra una maquina
+ * 
+ * @param short   Color del jugador (-1 o 1)
+ * @param x       Apuntador resultante donde se coloco el movimiento de X
+ * @param y       Apuntador resultante donde se coloco el movimiento de X
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::computerMove(short color, short *x, short *y)
 {
     int randx = rand() % 8;
@@ -139,42 +214,14 @@ void Tablero::computerMove(short color, short *x, short *y)
     }
 }
 
-short Tablero::cantidadNegras()
-{
-    short cantidad = 0;
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            if (Tablero::fichas[i][j] == 1)
-            {
-                cantidad++;
-            }
-        }
-    }
-
-    return cantidad;
-}
-
-short Tablero::cantidadBlancas()
-{
-    short cantidad = 0;
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            if (Tablero::fichas[i][j] == -1)
-            {
-                cantidad++;
-            }
-        }
-    }
-
-    return cantidad;
-}
-
+/**
+ * Valida que exista un turno minimo para el jugador del color
+ * sin contemplar los dados
+ *
+ * @param  color   -1 si es blanco o 1 si es negro
+ * @return         Verdadero si puede mover o falso si no
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 bool Tablero::turnoGlobalValido(short color)
 {
     for (int i = 0; i < 8; i++)
@@ -191,6 +238,14 @@ bool Tablero::turnoGlobalValido(short color)
     return false;
 }
 
+/**
+ * Valida que exista un turno minimo para el jugador del color
+ * contemplando a los dados
+ * 
+ * @param  color   -1 si es blanco o 1 si es negro
+ * @return         Si puede mover la ficha
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 bool Tablero::turnoValido(short color)
 {
     for (int i = 0; i < 8; i++)
@@ -212,6 +267,15 @@ bool Tablero::turnoValido(short color)
     return false;
 }
 
+/**
+ * Valida un movimiento en una posicion en especifico
+ * 
+ * @param  x     Posicion X del tablero del 0-7
+ * @param  y     Posicion Y del tablero del 0-7
+ * @param  color -1 si es blanco o 1 si es negro
+ * @return       Si el turno es valido o no
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 bool Tablero::validarMovimiento(int x, int y, int color)
 {
     if (fichas[x][y] != 0)
@@ -409,6 +473,14 @@ bool Tablero::validarMovimiento(int x, int y, int color)
     return valido;
 }
 
+/**
+ * Se ejecuta la accion de color una ficha en el tablero
+ * 
+ * @param x     Posicion X del tablero donde se inserta la ficha 0-7
+ * @param y     Posicion Y del tablero donde se inserta la ficha 0-7
+ * @param color -1 si es blanco o 1 si es negro
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::colocarFicha(int x, int y, int color)
 {
     bool posible = false;
@@ -682,6 +754,11 @@ void Tablero::colocarFicha(int x, int y, int color)
     Tablero::setFicha(x, y, color);
 }
 
+/**
+ * Tira los dados generando tres numeros psudo-aleatorios
+ * 
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::tirarDados()
 {
     srand (time(NULL));
@@ -701,6 +778,13 @@ void Tablero::tirarDados()
     }
 }
 
+/**
+ * Revisa si existe un numero en los dados ya puesto evitando repeticiones
+ * 
+ * @param  num  Numero a revisar
+ * @return      Si ya existe el numero en los dados
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 bool Tablero::numInDados(short x)
 {
     if (dados[0] == x || dados[1] == x || dados[2] == x)
@@ -713,97 +797,22 @@ bool Tablero::numInDados(short x)
     }
 }
 
+/**
+ * Pone los tres dados con el valor de 0
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::inicializarDados()
 {
     memset (dados, 0, sizeof(dados));
 }
 
-uint8_t Tablero::standardValor(short int x)
-{
-    if (x < 0)
-    {
-        return 2;
-    }
-    else if (x > 0)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-short int Tablero::tableroValor(uint8_t x)
-{
-    if (x == 1)
-    {
-        return 1;
-    }
-    else if (x == 2)
-    {
-        return -1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-uint128_t Tablero::tableroToBytes(Tablero x)
-{
-    uint128_t bytes;
-    int contador = 0;
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j+=4)
-        {
-            uint8_t oneByte;
-
-            oneByte = (standardValor(x.getFicha(i,j)) << 6)   | (standardValor(x.getFicha(i,j+1)) << 4) |
-                      (standardValor(x.getFicha(i,j+2)) << 2) | (standardValor(x.getFicha(i,j+3)));
-
-            bytes.byte[contador] = oneByte;
-            contador++;
-        }
-    }
-
-    return bytes;
-}
-
-Tablero Tablero::bytesToTablero(uint128_t x)
-{
-    Tablero tab;
-
-    int contador = 0;
-
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j+=4)
-        {
-            uint8_t oneByte = x.byte[contador];
-            uint8_t temp;
-
-            temp = (oneByte & 0xC0) >> 6;
-            tab.setFicha(i,j, tableroValor(temp));
-
-            temp = (oneByte & 0x30) >> 4;
-            tab.setFicha(i,j+1, tableroValor(temp));
-
-            temp = (oneByte & 0x0C) >> 2;
-            tab.setFicha(i,j+2, tableroValor(temp));
-
-            temp = (oneByte & 0x03);
-            tab.setFicha(i,j+3, tableroValor(temp));
-
-            contador++;
-        }
-    }
-
-    return tab;
-}
-
+/**
+ * Regresa si las fichas de dos tableros son iguales
+ * @param  c segundo tablero a evaluar
+ * @return   Si los dos tableros son iguales
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 bool Tablero::TableroIgual(Tablero c)
 {
     for (int i = 0; i < 8; i++)
@@ -820,6 +829,16 @@ bool Tablero::TableroIgual(Tablero c)
     return true;
 }
 
+/**
+ * Busca el movimiento que se hizo de un tablero a otro
+ * 
+ * @param antes    Tablero antes del movimiento
+ * @param despues  Tablero despues del movimiento
+ * @param color    Color que se pretendio hacer
+ * @param x        Apuntador con la posicion X resultante
+ * @param y        apuntador con la posicion Y resultante
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::buscarMovimiento(Tablero antes, Tablero despues, short color, int* x, int* y)
 {
     Tablero resultado;
@@ -842,9 +861,132 @@ void Tablero::buscarMovimiento(Tablero antes, Tablero despues, short color, int*
     }
 }
 
+/**
+ * Empaca la ficha de una casilla de -1, 0, 1 a su version del Protocolo RV
+ * 
+ * @param  x  color a cambiar
+ * @return    2 si es negro, 1 si es blanco, 0 si no tiene color
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+uint8_t Tablero::standardValor(short int x)
+{
+    if (x < 0)
+    {
+        return 2;
+    }
+    else if (x > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/**
+ * Agarra un byte del protocolo RV y lo desempaca en su forma -1, 0, 1
+ * 
+ * @param  x  byte a desempacar
+ * @return    -1 si es negro, 1 si es blanco, 0 si no tiene color
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+short int Tablero::tableroValor(uint8_t x)
+{
+    if (x == 1)
+    {
+        return 1;
+    }
+    else if (x == 2)
+    {
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/**
+ * Transforma el tablero x su version de 128 bytes
+ * 
+ * @param  x Tablero a empaquetar
+ * @return   Conjunto de Bytes a enviar
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+uint128_t Tablero::tableroToBytes(Tablero x)
+{
+    uint128_t bytes;
+    int contador = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j+=4)
+        {
+            //Empacamos cuatro casillas en un byte
+            uint8_t oneByte;
+
+            oneByte = (standardValor(x.getFicha(i,j)) << 6)   | 
+                      (standardValor(x.getFicha(i,j+1)) << 4) |
+                      (standardValor(x.getFicha(i,j+2)) << 2) | 
+                      (standardValor(x.getFicha(i,j+3)));
+
+            bytes.byte[contador] = oneByte;
+            contador++;
+        }
+    }
+
+    return bytes;
+}
+
+/**
+ * Transforma un 128 bits en un tablero
+ * 
+ * @param  x  Estructura de 128 bits a transformar
+ * @return    Tablero resultante
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
+Tablero Tablero::bytesToTablero(uint128_t x)
+{
+    Tablero tab;
+
+    int contador = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j+=4)
+        {
+            //Desempacamos cuatro casillas desde un byte
+            uint8_t oneByte = x.byte[contador];
+            uint8_t temp;
+
+            temp = (oneByte & 0xC0) >> 6;
+            tab.setFicha(i,j, tableroValor(temp));
+
+            temp = (oneByte & 0x30) >> 4;
+            tab.setFicha(i,j+1, tableroValor(temp));
+
+            temp = (oneByte & 0x0C) >> 2;
+            tab.setFicha(i,j+2, tableroValor(temp));
+
+            temp = (oneByte & 0x03);
+            tab.setFicha(i,j+3, tableroValor(temp));
+
+            contador++;
+        }
+    }
+
+    return tab;
+}
+
+/**
+ * Imprime el tablero en una terminal de linux
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Tablero::imprimirTablero()
 {
-    //cout << endl;
+    cout << endl;
 
     for (int i = 0; i < 8; i++)
     {
@@ -852,18 +994,18 @@ void Tablero::imprimirTablero()
         {
             if (Tablero::fichas[i][j] == 1)
             {
-                //cout << "X";
+                cout << "N";
             }
             else if (Tablero::fichas[i][j] == -1)
             {
-                //cout << "Y";
+                cout << "B";
             }
             else
             {
-                //cout << "#";
+                cout << ".";
             }
         }
 
-        //cout << endl;
+        cout << endl;
     }
 }

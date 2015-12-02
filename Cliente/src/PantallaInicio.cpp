@@ -8,7 +8,7 @@
 
 using namespace std;
 
-//Constructor
+///Constructor
 PantallaInicio::PantallaInicio(SDL_Surface* vent, FuncionesPantalla* fe)
 {
     PantallaInicio::opcionMenu = 1;
@@ -16,13 +16,17 @@ PantallaInicio::PantallaInicio(SDL_Surface* vent, FuncionesPantalla* fe)
     PantallaInicio::f = fe;
 }
 
-//Destructor
+///Destructor
 PantallaInicio::~PantallaInicio()
 {
     PantallaInicio::ventana = NULL;
 }
 
-//Funcion de la pantallaInicio
+/**
+ * Refresca el contenido de la ventana interna para mostrar
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaInicio::imprimirPantallaInterna()
 {
     Uint32 color = SDL_MapRGB(PantallaInicio::ventana->format, 0,0,0); //negro
@@ -33,10 +37,10 @@ void PantallaInicio::imprimirPantallaInterna()
     f->escribirPalabra(PantallaInicio::ventana, "Reversi", 5, 48, "Blazed", 43, 255, 0, 0);
     f->cargarImagen(PantallaInicio::ventana, "img/logo.bmp", TAM_CUADRO*6, TAM_CUADRO/2);
 
-    f->escribirPalabra(PantallaInicio::ventana, "VS Computadora", 75, 170, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(PantallaInicio::ventana, "VS Jugador 2", 110, 250, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(PantallaInicio::ventana, "Opciones", 135, 330, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(PantallaInicio::ventana, "Salir", 150, 400, "Arcarde", 30, 255, 255, 0);
+    f->escribirPalabra(ventana, "VS Computadora", 75, 170, "Arcarde", 30, 255, 255, 0);
+    f->escribirPalabra(ventana, "VS Jugador 2", 110, 250, "Arcarde", 30, 255, 255, 0);
+    f->escribirPalabra(ventana, "Opciones", 135, 330, "Arcarde", 30, 255, 255, 0);
+    f->escribirPalabra(ventana, "Salir", 150, 400, "Arcarde", 30, 255, 255, 0);
 
     if (PantallaInicio::opcionMenu == 1)
     {
@@ -58,6 +62,11 @@ void PantallaInicio::imprimirPantallaInterna()
     SDL_UpdateRect(PantallaInicio::ventana, 0, 0, 0, 0);
 }
 
+/**
+ * Funcion encargada de gestionar los eventos en la aplicacion
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 int PantallaInicio::imprimirPantalla()
 {
     SDL_Event Evento1;

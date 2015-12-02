@@ -14,6 +14,7 @@
 
 using namespace std;
 
+///Constructor
 Principal::Principal()
 {
     Principal::pi = NULL;
@@ -22,13 +23,17 @@ Principal::Principal()
     Principal::cl = NULL;
 }
 
+/**
+ * Punto de partida del juego a comenzar a jugar
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void Principal::jugar()
 {
-    //Inicialize the vars
     SDL_Surface* Pantalla;
     FuncionesPantalla* f = new FuncionesPantalla();
 
-    // Initialize SDL, using only the video library.
+    //Inicializar SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         //cout << "Unable to init SDL: " << SDL_GetError() << endl;
@@ -42,7 +47,7 @@ void Principal::jugar()
     	exit(1);
     }
 
-    // Create a screen surface, and set the video mode
+    //Creamos la pantalla
     Pantalla = SDL_SetVideoMode(TAM_CUADRO*9+TAM_LINEA, TAM_CUADRO*12+TAM_LINEA, 32, SDL_SWSURFACE);
 
     if (Pantalla == NULL)
@@ -62,6 +67,7 @@ void Principal::jugar()
 
     int op;
 
+    //Establecemos el titulo
     SDL_WM_SetCaption("Reversi", NULL);
 
     do

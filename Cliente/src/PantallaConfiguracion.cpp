@@ -6,6 +6,7 @@
 #include "PantallaConfiguracion.h"
 #include "Constantes.h"
 
+///Constructores
 PantallaConfiguracion::PantallaConfiguracion(SDL_Surface* vent, FuncionesPantalla* f)
 {
     PantallaConfiguracion::ventana = vent;
@@ -16,7 +17,8 @@ PantallaConfiguracion::PantallaConfiguracion(SDL_Surface* vent, FuncionesPantall
     PantallaConfiguracion::f = f;
 }
 
-PantallaConfiguracion::PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, string hj, string p)
+PantallaConfiguracion::PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, 
+                                             string hj, string p)
 {
     PantallaConfiguracion::ventana = vent;
     PantallaConfiguracion::hostJugador = hj;
@@ -25,12 +27,12 @@ PantallaConfiguracion::PantallaConfiguracion(SDL_Surface * vent, FuncionesPantal
     PantallaConfiguracion::opcionMenu = 1;
 }
 
-//Destructor
 PantallaConfiguracion::~PantallaConfiguracion()
 {
     PantallaConfiguracion::ventana = NULL;
 }
 
+///Getters
 string PantallaConfiguracion::getNombreJugador()
 {
     return PantallaConfiguracion::nombreJugador;
@@ -46,6 +48,7 @@ string PantallaConfiguracion::getPuerto()
     return PantallaConfiguracion::puerto;
 }
 
+///Setters
 void PantallaConfiguracion::setNombreJugador(string x)
 {
     PantallaConfiguracion::nombreJugador = x;
@@ -61,23 +64,30 @@ void PantallaConfiguracion::setPuerto(string x)
     PantallaConfiguracion::puerto = x;
 }
 
-//Métodos de la clase
+///Métodos de la clase
+
+/**
+ * Refresca el contenido de la ventana interna para mostrar
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaConfiguracion::imprimirPantallaInterna()
 {
     SDL_Rect areai;
     SDL_Rect areae;
     Uint32 color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 0,0,0); //negro
     Uint32 colorIn = SDL_MapRGB(PantallaConfiguracion::ventana->format, 200,200,200); //gris
-    Uint32 colorAc = SDL_MapRGB(PantallaConfiguracion::ventana->format, 250,200,0); //amarillo fuerte
+    Uint32 colorAc = SDL_MapRGB(PantallaConfiguracion::ventana->format, 250,200,0); //amarillo 
 
     //Rellenamos de negro el tablero
     SDL_FillRect(PantallaConfiguracion::ventana, NULL, color);
 
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Reversi", 15, 48, "Blazed", 60, 255, 0, 0);
+    f->escribirPalabra(ventana, "Reversi", 15, 48, "Blazed", 60, 255, 0, 0);
+    
     //Insertamos las etiquetas de las configuraciones
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Nombre Jugador", 90, 170, "Arcarde", 20, 255, 255, 0);
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Host o IP a conectar", 70, 250, "Arcarde", 20, 255, 255, 0);
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Puerto a conectar", 80, 330, "Arcarde", 20, 255, 255, 0);
+    f->escribirPalabra(ventana, "Nombre Jugador", 90, 170, "Arcarde", 20, 255, 255, 0);
+    f->escribirPalabra(ventana, "Host o IP a conectar", 70, 250, "Arcarde", 20, 255, 255, 0);
+    f->escribirPalabra(ventana, "Puerto a conectar", 80, 330, "Arcarde", 20, 255, 255, 0);
 
     //Area del cuadro de texto NJ
     areae.x = 20;
@@ -95,13 +105,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::nombreJugador + "_", 30, 200, "Digital", 25, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(ventana, PantallaConfiguracion::nombreJugador + "_", 30, 200, 
+                           "Digital", 25, 169, 255, 118); //Verde Claro
     }
     else
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::nombreJugador, 30, 200, "Digital", 25, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::nombreJugador, 
+                          30, 200, "Digital", 25, 169, 255, 118); //Verde Claro
     }
 
     //Area del cuadro de texto HC
@@ -121,13 +133,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador + "_", 30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador + "_", 
+                           30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
     }
     else
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador, 30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador, 
+                           30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
     }
 
     //Area del cuadro de texto Puerto
@@ -147,13 +161,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto + "_", 30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto + "_", 
+                           30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
     }
     else
     {
         SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto, 30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
+        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto, 
+                           30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
     }
 
     //Area del Boton de Salir
@@ -180,12 +196,18 @@ void PantallaConfiguracion::imprimirPantallaInterna()
         SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
     }
 
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Guardar", areai.x + 35, areai.y + 2, "Arcarde", 20, 255, 255, 255);
+    f->escribirPalabra(PantallaConfiguracion::ventana, "Guardar", areai.x + 35, areai.y + 2, 
+                       "Arcarde", 20, 255, 255, 255);
 
     //Actualizamos la pantalla
     SDL_UpdateRect(PantallaConfiguracion::ventana, 0, 0, 0, 0);
 }
 
+/**
+ * Funcion encargada de gestionar los eventos en la aplicacion
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaConfiguracion::imprimirPantalla()
 {
     SDL_Event Evento;

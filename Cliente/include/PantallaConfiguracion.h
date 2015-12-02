@@ -7,9 +7,15 @@
 
 using namespace std;
 
+/**
+* Clase Encargada de generar una ventana en SDL para la configuracion
+*
+* @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+**/
 class PantallaConfiguracion
 {
     private:
+    ///Atributos
         SDL_Surface* ventana;
         string nombreJugador;
         string hostJugador;
@@ -17,26 +23,41 @@ class PantallaConfiguracion
         int opcionMenu;
         FuncionesPantalla* f;
 
-        //Funcion de la pantallaInicio
+    //Funcion de la pantalla
+    
+        /**
+         * Refresca el contenido de la ventana interna para mostrar
+         *
+         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+         */
         void imprimirPantallaInterna();
 
     public:
-        //Constructor
+    ///Constructores
         PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f);
-        PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, string hj, string p);
+        PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, 
+                              string hj, string p);
 
         //Destructor
         ~PantallaConfiguracion();
 
-        //Funcion de la pantallaInicio
+    ///Getters
         string getNombreJugador();
         string getHost();
         string getPuerto();
 
+    ///Setters
         void setNombreJugador(string x);
         void setHost(string x);
         void setPuerto(string x);
 
+    ///Funcion de la pantalla
+
+        /**
+         * Funcion encargada de gestionar los eventos en la aplicacion
+         *
+         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+         */
         void imprimirPantalla();
 };
 

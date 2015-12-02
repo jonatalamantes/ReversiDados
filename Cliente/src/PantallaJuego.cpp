@@ -10,6 +10,7 @@
 
 using namespace std;
 
+///Constructor
 PantallaJuego::PantallaJuego(SDL_Surface* v, FuncionesPantalla* fp)
 {
     srand(time(NULL));
@@ -32,6 +33,7 @@ PantallaJuego::PantallaJuego(SDL_Surface* v, FuncionesPantalla* fp)
     }
 }
 
+///Setters
 void PantallaJuego::setNombreJugador1(string j)
 {
     PantallaJuego::nombreJugador1 = j;
@@ -42,6 +44,11 @@ void PantallaJuego::setNombreJugador2(string j)
     PantallaJuego::nombreJugador2 = j;
 }
 
+/**
+ * Inicializa la ventana y el tablero
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaJuego::inicializar()
 {
     srand(time(NULL));
@@ -69,6 +76,11 @@ void PantallaJuego::inicializar()
     PantallaJuego::tablero.setFicha(3, 4, 1);
 }
 
+/**
+ * Crea una animacion para los dados
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaJuego::animacionDado()
 {
     SDL_Rect rectangulo;
@@ -159,7 +171,7 @@ void PantallaJuego::animacionDado()
 
                 f->cargarImagen(PantallaJuego::ventana, cad.c_str(), rectangulo.x, rectangulo.y);
 
-                SDL_UpdateRect(PantallaJuego::ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+                SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
 
                 ptiempo = tiempo;
                 i++;
@@ -173,7 +185,6 @@ void PantallaJuego::animacionDado()
     }
 
     //Cargamos el dado y ponemos el numero
-    //f->cargarImagen(PantallaJuego::ventana, "img/animacionDado1.bmp", rectangulo.x, rectangulo.y);
     rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
     rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
     rectangulo.w = tamCuadro;
@@ -269,6 +280,11 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
     sleep(1);
 }
 
+/**
+ * Dibuja la ventana del tablero
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaJuego::dibujarTablero()
 {
     int iniX, iniY, maxX, maxY;
@@ -347,14 +363,14 @@ void PantallaJuego::dibujarTablero()
     }
 
     //Dibuja los números en el tablero
-    f->escribirPalabra(PantallaJuego::ventana, "1", 10+TAM_CUADRO*1, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "2", 10+TAM_CUADRO*2, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "3", 10+TAM_CUADRO*3, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "4", 10+TAM_CUADRO*4, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "5", 10+TAM_CUADRO*5, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "6", 10+TAM_CUADRO*6, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "7", 10+TAM_CUADRO*7, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "8", 10+TAM_CUADRO*8, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "1", 10+TAM_CUADRO*1, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "2", 10+TAM_CUADRO*2, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "3", 10+TAM_CUADRO*3, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "4", 10+TAM_CUADRO*4, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "5", 10+TAM_CUADRO*5, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "6", 10+TAM_CUADRO*6, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "7", 10+TAM_CUADRO*7, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    f->escribirPalabra(ventana, "8", 10+TAM_CUADRO*8, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
 
     f->escribirPalabra(PantallaJuego::ventana, "1", 10, 7+TAM_CUADRO*3, "NinjaNaruto", 28);
     f->escribirPalabra(PantallaJuego::ventana, "2", 10, 7+TAM_CUADRO*4, "NinjaNaruto", 28);
@@ -377,8 +393,8 @@ void PantallaJuego::dibujarTablero()
         f->cargarImagen(PantallaJuego::ventana, "img/btnJugadorA.bmp", 5, TAM_CUADRO+3);
     }
 
-    f->escribirPalabra(PantallaJuego::ventana, "Jugador A: " + nombreJugador1, 25, 0, "HelveticaStandar", 16);
-    f->escribirPalabra(PantallaJuego::ventana, "Jugador B: " + nombreJugador2, 25, TAM_CUADRO, "HelveticaStandar", 16);
+    f->escribirPalabra(ventana, "Jugador A: " + nombreJugador1, 25, 0, "HelveticaStandar", 16);
+    f->escribirPalabra(ventana, "Jugador B: "+nombreJugador2,25,TAM_CUADRO, "HelveticaStandar", 16);
 
     //Cargamos los tres octagonos
     short dado;
@@ -389,12 +405,13 @@ void PantallaJuego::dibujarTablero()
 
         if (dado == 0)
         {
-            f->cargarImagen(PantallaJuego::ventana, "img/octagonoVacio.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
+            f->cargarImagen(ventana, "img/octagonoVacio.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
         }
         else
         {
-            f->cargarImagen(PantallaJuego::ventana, "img/octagonoLleno.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
-            f->escribirPalabra(PantallaJuego::ventana, strc.intToStr(dado), TAM_CUADRO*(6+i)+4, TAM_CUADRO/2+13, "KeepCalm", 15);
+            f->cargarImagen(ventana, "img/octagonoLleno.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
+            f->escribirPalabra(PantallaJuego::ventana, strc.intToStr(dado), TAM_CUADRO*(6+i)+4, 
+                               TAM_CUADRO/2+13, "KeepCalm", 15);
         }
     }
 
@@ -402,18 +419,20 @@ void PantallaJuego::dibujarTablero()
     if (Fin)
     {
         f->cargarImagen(PantallaJuego::ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-        f->escribirPalabra(PantallaJuego::ventana, "c e r r a r", TAM_CUADRO*6+27, TAM_CUADRO*11+15, "CrownTitle", 22);
+        f->escribirPalabra(PantallaJuego::ventana, "c e r r a r", TAM_CUADRO*6+27, 
+                           TAM_CUADRO*11+15, "CrownTitle", 22);
     }
     else
     {
         if (dadosSet == false || turnoJugador != colorJugador)
         {
-            f->cargarImagen(PantallaJuego::ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-            f->escribirPalabra(PantallaJuego::ventana, "tirar dados", TAM_CUADRO*6+19, TAM_CUADRO*11+15, "CrownTitle", 22);
+            f->cargarImagen(ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+            f->escribirPalabra(ventana, "tirar dados", TAM_CUADRO*6+19, TAM_CUADRO*11+15, 
+                               "CrownTitle", 22);
         }
         else
         {
-            f->cargarImagen(PantallaJuego::ventana, "img/btnOff.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+            f->cargarImagen(ventana, "img/btnOff.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
         }
     }
 
@@ -454,7 +473,7 @@ void PantallaJuego::dibujarTablero()
         estadoJuego = "No tiene movimiento";
     }
 
-    f->escribirPalabra(PantallaJuego::ventana, estadoJuego, 15, TAM_CUADRO*11+15, "KeepCalm", 15, 255, 255, 0);
+    f->escribirPalabra(ventana, estadoJuego, 15, TAM_CUADRO*11+15, "KeepCalm", 15, 255, 255, 0);
 
     //Cargamos las fichas del tablero
     short int colorFicha;
@@ -538,6 +557,12 @@ void PantallaJuego::dibujarTablero()
     }
 }
 
+/**
+ * Dibuja a Reversi-chan segun el estado (ver imagenes)
+ * 
+ * @param estado [description]
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaJuego::dibujarReversiChan(int estado)
 {
     //Marco de la miniventana
@@ -569,24 +594,30 @@ void PantallaJuego::dibujarReversiChan(int estado)
     if (estado == 1)
     {
         f->cargarImagen(ventana, "img/ReversiChan1.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+                           18, 255,255,255);
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+                           18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 2)
     {
         f->cargarImagen(ventana, "img/ReversiChan2.png", rectangulo.x + 15, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+                           18, 255,255,255);
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+                           18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 3)
     {
         f->cargarImagen(ventana, "img/ReversiChan3.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+                           18, 255,255,255);
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+                           18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
@@ -594,45 +625,54 @@ void PantallaJuego::dibujarReversiChan(int estado)
     {
         //Imprimimos la imagen necesaria
         f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x+10, rectangulo.y);
-        f->escribirPalabra(ventana, "Oponente", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 16, 0,0,0);
-        f->escribirPalabra(ventana, "No Encontrado", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 16, 0,0,0);
+        f->escribirPalabra(ventana, "Oponente", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 
+                           16, 0,0,0);
+        f->escribirPalabra(ventana, "No Encontrado", rectangulo.x + 5, rectangulo.y + 210, 
+                           "Arcarde", 16, 0,0,0);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 5)
     {
         f->cargarImagen(ventana, "img/ReversiChan5.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Negro", rectangulo.x + 45, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 
+                           18, 255,255,255);
+        f->escribirPalabra(ventana, "Negro", rectangulo.x + 45, rectangulo.y + 210, "Arcarde", 
+                           18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 6)
     {
         f->cargarImagen(ventana, "img/ReversiChan6.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Blanco", rectangulo.x + 40, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, 
+                          "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Blanco", rectangulo.x + 40, rectangulo.y + 210, 
+                          "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 7)
     {
         f->cargarImagen(ventana, "img/ReversiChan7.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Ganador", rectangulo.x + 35, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Ganador", rectangulo.x + 35, rectangulo.y + 210, 
+                           "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 8)
     {
         f->cargarImagen(ventana, "img/ReversiChan8.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Perdedor", rectangulo.x + 30, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Perdedor", rectangulo.x + 30, rectangulo.y + 210, 
+                           "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
     else if (estado == 9)
     {
         f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Empate", rectangulo.x + 40, rectangulo.y + 210, "Arcarde", 18, 255,255,255);
+        f->escribirPalabra(ventana, "Empate", rectangulo.x + 40, rectangulo.y + 210, 
+                          "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
     }
@@ -889,7 +929,8 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
             {
                 //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
             }
-            else if ((revisar.revents & POLLIN) == POLLIN || (revisar.revents & POLLRDNORM) == POLLRDNORM)
+            else if ((revisar.revents & POLLIN) == POLLIN || 
+                     (revisar.revents & POLLRDNORM) == POLLRDNORM)
             {
                 //Leemos los datos del socket
                 char buffer[256];
@@ -957,7 +998,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                         PantallaJuego::tablero.inicializarDados();
 
                         int px, py;
-                        tablero.buscarMovimiento(antes, tablero, PantallaJuego::colorJugador, &px, &py);
+                        tablero.buscarMovimiento(antes, tablero, colorJugador, &px, &py);
 
                         posibleX = -1;
                         posibleY = -1;
@@ -1057,7 +1098,8 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                 int y = Evento.button.y;
                 int x = Evento.button.x;
 
-                if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                    x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                 {
                     endgame = true;
                 }
@@ -1090,7 +1132,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                             if ((posibleX != tabX || posibleY != tabY) &&
                                (tablero.numInDados(tabX) || tablero.numInDados(tabY)) )
                             {
-                                if (PantallaJuego::tablero.validarMovimiento(tabX-1,  tabY-1, PantallaJuego::colorJugador))
+                                if (tablero.validarMovimiento(tabX-1,  tabY-1, colorJugador))
                                 {
                                     posibleX = tabX;
                                     posibleY = tabY;
@@ -1116,7 +1158,8 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                            x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                         {
                             cl->armarPaquetePedirDado(PantallaJuego::colorJugador);
 
@@ -1128,7 +1171,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                     }
                     else //Hace Movimiento
                     {
-                        if (PantallaJuego::turnoJugador == PantallaJuego::colorJugador) //Turno Jugador Blancas
+                        if (turnoJugador == colorJugador) //Turno Jugador Blancas
                         {
                             int tabY = ((y/TAM_CUADRO) - 2);
                             int tabX = ((x/TAM_CUADRO) - 0);
@@ -1138,7 +1181,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                             {
                                 if (tablero.numInDados(tabX) || tablero.numInDados(tabY))
                                 {
-                                    if (PantallaJuego::tablero.validarMovimiento(tabX-1,  tabY-1, PantallaJuego::colorJugador))
+                                    if (tablero.validarMovimiento(tabX-1,  tabY-1, colorJugador))
                                     {
                                         posibleX = -1;
                                         posibleY = -1;
@@ -1166,7 +1209,11 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
     close(cl->getSock());
 }
 
-
+/**
+ * Genera una jugabilidad normal contra la computadora
+ * 
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ */
 void PantallaJuego::gestionarEventos()
 {
     SDL_Event Evento;
@@ -1285,13 +1332,13 @@ void PantallaJuego::gestionarEventos()
                     //Validamos el movimiento
                     if (x != -1 && y != -1)
                     {
-                        if (PantallaJuego::tablero.validarMovimiento(x, y, PantallaJuego::colorJugador * (-1)))
+                        if (PantallaJuego::tablero.validarMovimiento(x, y, colorJugador * (-1)))
                         {
                             sleep(1);
 
                             //Cargamos el movimiento de la computadora
-                            PantallaJuego::tablero.colocarFicha(x, y, PantallaJuego::colorJugador * (-1));
-                            PantallaJuego::ponerAnimacion(t, PantallaJuego::colorJugador * (-1), x+1, y+1);
+                            PantallaJuego::tablero.colocarFicha(x, y, colorJugador * (-1));
+                            PantallaJuego::ponerAnimacion(t, colorJugador * (-1), x+1, y+1);
                             PantallaJuego::turnoJugador = PantallaJuego::colorJugador;
 
                             PantallaJuego::tablero.inicializarDados();
@@ -1321,7 +1368,7 @@ void PantallaJuego::gestionarEventos()
                             if ((posibleX != tabX || posibleY != tabY) &&
                                (tablero.numInDados(tabX) || tablero.numInDados(tabY)) )
                             {
-                                if (PantallaJuego::tablero.validarMovimiento(tabX-1,  tabY-1, PantallaJuego::colorJugador))
+                                if (tablero.validarMovimiento(tabX-1,  tabY-1, colorJugador))
                                 {
                                     posibleX = tabX;
                                     posibleY = tabY;
@@ -1347,7 +1394,8 @@ void PantallaJuego::gestionarEventos()
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                            x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                         {
                             PantallaJuego::tablero.tirarDados();
                             PantallaJuego::animacionDado();
@@ -1365,7 +1413,7 @@ void PantallaJuego::gestionarEventos()
                     }
                     else //Hace Movimiento
                     {
-                        if (PantallaJuego::turnoJugador == PantallaJuego::colorJugador) //Turno Jugador Blancas
+                        if (PantallaJuego::turnoJugador == colorJugador) //Turno Jugador Blancas
                         {
                             int tabY = ((y/TAM_CUADRO) - 2);
                             int tabX = ((x/TAM_CUADRO) - 0);
@@ -1375,7 +1423,7 @@ void PantallaJuego::gestionarEventos()
                             {
                                 if (tablero.numInDados(tabX) || tablero.numInDados(tabY))
                                 {
-                                    if (PantallaJuego::tablero.validarMovimiento(tabX-1,  tabY-1, PantallaJuego::colorJugador))
+                                    if (tablero.validarMovimiento(tabX-1,  tabY-1, colorJugador))
                                     {
                                         posibleX = -1;
                                         posibleY = -1;
@@ -1383,10 +1431,10 @@ void PantallaJuego::gestionarEventos()
                                         //Insertamos la ficha que deseamos
                                         Tablero t;
                                         t = PantallaJuego::tablero;
-                                        PantallaJuego::tablero.colocarFicha(tabX-1, tabY-1, PantallaJuego::colorJugador);
+                                        tablero.colocarFicha(tabX-1, tabY-1, colorJugador);
 
-                                        PantallaJuego::ponerAnimacion(t, PantallaJuego::colorJugador, tabX, tabY);
-                                        PantallaJuego::turnoJugador = (-1) * PantallaJuego::colorJugador;
+                                        ponerAnimacion(t, PantallaJuego::colorJugador, tabX, tabY);
+                                        PantallaJuego::turnoJugador = (-1) * colorJugador;
 
                                         PantallaJuego::tablero.inicializarDados();
                                         dadosSet = false;
