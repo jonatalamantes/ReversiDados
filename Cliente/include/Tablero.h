@@ -48,7 +48,7 @@ class Tablero
 	    void setDado(short int p, unsigned short int val);
 
     ///Funciones de la clase
- 
+
    		/**
     	 * Subturina que establece los datos del tablero en vacios
     	 *
@@ -58,7 +58,7 @@ class Tablero
 
 		/**
 		 * Devuelve la cantidad de fichas negras en el tablero
-		 * 
+		 *
 		 * @return   La cantidad de fichas negras
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
 		 */
@@ -66,7 +66,7 @@ class Tablero
 
 	    /**
 		 * Devuelve la cantidad de fichas blancas en el tablero
-		 * 
+		 *
 		 * @return   La cantidad de fichas blancas
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
 		 */
@@ -75,7 +75,7 @@ class Tablero
 	    /**
 	     * Valida que exista un turno minimo para el jugador del color
 	     * contemplando a los dados
-	     * 
+	     *
 	     * @param  color   -1 si es blanco o 1 si es negro
 	     * @return         Si puede mover la ficha
 	     * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -87,14 +87,14 @@ class Tablero
 	     * sin contemplar los dados
 	     *
 	     * @param  color   -1 si es blanco o 1 si es negro
-	     * @return         Verdadero si puede mover o falso si no
+	     * @return         Posicion del tablero probable a poner o -1
 	     * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-	     */    	
-    	bool turnoGlobalValido(short color); //Mínimo un movimiento Global
+	     */
+	    short turnoGlobalValido(short color);
 
 	    /**
 	     * Valida un movimiento en una posicion en especifico
-	     * 
+	     *
 	     * @param  x     Posicion X del tablero del 0-7
 	     * @param  y     Posicion Y del tablero del 0-7
 	     * @param  color -1 si es blanco o 1 si es negro
@@ -102,17 +102,18 @@ class Tablero
 	     * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
 	     */
 		bool validarMovimiento(int x,int y, int color);
-		
+
 		/**
 		 * Tira los dados generando tres numeros psudo-aleatorios
-		 * 
+		 *
+		 * @param forceColor  El primer dado termina con el color que se da menos uno
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
 		 */
-		void tirarDados();
+		void tirarDados(int forceColor);
 
 		/**
 		 * Se ejecuta la accion de color una ficha en el tablero
-		 * 
+		 *
 		 * @param x     Posicion X del tablero donde se inserta la ficha 0-7
 		 * @param y     Posicion Y del tablero donde se inserta la ficha 0-7
 		 * @param color -1 si es blanco o 1 si es negro
@@ -129,7 +130,7 @@ class Tablero
 
 		/**
 		 * Revisa si existe un numero en los dados ya puesto evitando repeticiones
-		 * 
+		 *
 		 * @param  num  Numero a revisar
 		 * @return      Si ya existe el numero en los dados
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -145,7 +146,7 @@ class Tablero
 
 		/**
 		 * Pequeña forma de jugar contra una maquina
-		 * 
+		 *
 		 * @param short   Color del jugador (-1 o 1)
 		 * @param x       Apuntador resultante donde se coloco el movimiento de X
 		 * @param y       Apuntador resultante donde se coloco el movimiento de X
@@ -155,7 +156,7 @@ class Tablero
 
 		/**
 		 * Busca el movimiento que se hizo de un tablero a otro
-		 * 
+		 *
 		 * @param antes    Tablero antes del movimiento
 		 * @param despues  Tablero despues del movimiento
 		 * @param color    Color que se pretendio hacer
@@ -167,7 +168,7 @@ class Tablero
 
 		/**
 		 * Regresa si las fichas de dos tableros son iguales
-		 * 
+		 *
 		 * @param  c segundo tablero a evaluar
 		 * @return   Si los dos tableros son iguales
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -176,7 +177,7 @@ class Tablero
 
 		/**
 		 * Empaca la ficha de una casilla de -1, 0, 1 a su version del Protocolo RV
-		 * 
+		 *
 		 * @param  x  color a cambiar
 		 * @return    2 si es negro, 1 si es blanco, 0 si no tiene color
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -185,7 +186,7 @@ class Tablero
 
 		/**
 		 * Agarra un byte del protocolo RV y lo desempaca en su forma -1, 0, 1
-		 * 
+		 *
 		 * @param  x  byte a desempacar
 		 * @return    -1 si es negro, 1 si es blanco, 0 si no tiene color
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -194,7 +195,7 @@ class Tablero
 
 		/**
 		 * Transforma el tablero x su version de 128 bytes
-		 * 
+		 *
 		 * @param  x Tablero a empaquetar
 		 * @return   Conjunto de Bytes a enviar
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -203,7 +204,7 @@ class Tablero
 
 		/**
 		 * Transforma un 128 bits en un tablero
-		 * 
+		 *
 		 * @param  x  Estructura de 128 bits a transformar
 		 * @return    Tablero resultante
 		 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>

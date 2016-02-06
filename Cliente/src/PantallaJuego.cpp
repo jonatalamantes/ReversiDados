@@ -410,7 +410,7 @@ void PantallaJuego::dibujarTablero()
         else
         {
             f->cargarImagen(ventana, "img/octagonoLleno.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
-            f->escribirPalabra(PantallaJuego::ventana, strc.intToStr(dado), TAM_CUADRO*(6+i)+4, 
+            f->escribirPalabra(PantallaJuego::ventana, strc.intToStr(dado), TAM_CUADRO*(6+i)+4,
                                TAM_CUADRO/2+13, "KeepCalm", 15);
         }
     }
@@ -419,7 +419,7 @@ void PantallaJuego::dibujarTablero()
     if (Fin)
     {
         f->cargarImagen(PantallaJuego::ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-        f->escribirPalabra(PantallaJuego::ventana, "c e r r a r", TAM_CUADRO*6+27, 
+        f->escribirPalabra(PantallaJuego::ventana, "c e r r a r", TAM_CUADRO*6+27,
                            TAM_CUADRO*11+15, "CrownTitle", 22);
     }
     else
@@ -427,7 +427,7 @@ void PantallaJuego::dibujarTablero()
         if (dadosSet == false || turnoJugador != colorJugador)
         {
             f->cargarImagen(ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-            f->escribirPalabra(ventana, "tirar dados", TAM_CUADRO*6+19, TAM_CUADRO*11+15, 
+            f->escribirPalabra(ventana, "tirar dados", TAM_CUADRO*6+19, TAM_CUADRO*11+15,
                                "CrownTitle", 22);
         }
         else
@@ -559,7 +559,7 @@ void PantallaJuego::dibujarTablero()
 
 /**
  * Dibuja a Reversi-chan segun el estado (ver imagenes)
- * 
+ *
  * @param estado [description]
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
@@ -594,9 +594,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     if (estado == 1)
     {
         f->cargarImagen(ventana, "img/ReversiChan1.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
                            18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
                            18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -604,9 +604,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 2)
     {
         f->cargarImagen(ventana, "img/ReversiChan2.png", rectangulo.x + 15, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
                            18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
                            18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -614,9 +614,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 3)
     {
         f->cargarImagen(ventana, "img/ReversiChan3.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde", 
+        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
                            18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde", 
+        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
                            18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -625,9 +625,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     {
         //Imprimimos la imagen necesaria
         f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x+10, rectangulo.y);
-        f->escribirPalabra(ventana, "Oponente", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 
+        f->escribirPalabra(ventana, "Oponente", rectangulo.x + 35, rectangulo.y + 190, "Arcarde",
                            16, 0,0,0);
-        f->escribirPalabra(ventana, "No Encontrado", rectangulo.x + 5, rectangulo.y + 210, 
+        f->escribirPalabra(ventana, "No Encontrado", rectangulo.x + 5, rectangulo.y + 210,
                            "Arcarde", 16, 0,0,0);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -635,9 +635,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 5)
     {
         f->cargarImagen(ventana, "img/ReversiChan5.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde", 
+        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde",
                            18, 255,255,255);
-        f->escribirPalabra(ventana, "Negro", rectangulo.x + 45, rectangulo.y + 210, "Arcarde", 
+        f->escribirPalabra(ventana, "Negro", rectangulo.x + 45, rectangulo.y + 210, "Arcarde",
                            18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -645,9 +645,9 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 6)
     {
         f->cargarImagen(ventana, "img/ReversiChan6.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, 
+        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190,
                           "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Blanco", rectangulo.x + 40, rectangulo.y + 210, 
+        f->escribirPalabra(ventana, "Blanco", rectangulo.x + 40, rectangulo.y + 210,
                           "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -655,7 +655,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 7)
     {
         f->cargarImagen(ventana, "img/ReversiChan7.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Ganador", rectangulo.x + 35, rectangulo.y + 210, 
+        f->escribirPalabra(ventana, "Ganador", rectangulo.x + 35, rectangulo.y + 210,
                            "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -663,7 +663,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 8)
     {
         f->cargarImagen(ventana, "img/ReversiChan8.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Perdedor", rectangulo.x + 30, rectangulo.y + 210, 
+        f->escribirPalabra(ventana, "Perdedor", rectangulo.x + 30, rectangulo.y + 210,
                            "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -671,7 +671,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
     else if (estado == 9)
     {
         f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Empate", rectangulo.x + 40, rectangulo.y + 210, 
+        f->escribirPalabra(ventana, "Empate", rectangulo.x + 40, rectangulo.y + 210,
                           "Arcarde", 18, 255,255,255);
 
         SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
@@ -681,7 +681,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
 /**
  * @param pc    Puntero hacia el objeto encargado de manejar los enventos en pantalla
  *
- * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>     
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
 void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
 {
@@ -880,7 +880,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
 /**
  * @param clrev    Puntero hacia el objeto con los datos del cliente
  *
- * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>     
+ * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
 void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 {
@@ -929,7 +929,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
             {
                 //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
             }
-            else if ((revisar.revents & POLLIN) == POLLIN || 
+            else if ((revisar.revents & POLLIN) == POLLIN ||
                      (revisar.revents & POLLRDNORM) == POLLRDNORM)
             {
                 //Leemos los datos del socket
@@ -1098,7 +1098,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                 int y = Evento.button.y;
                 int x = Evento.button.x;
 
-                if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
                     x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                 {
                     endgame = true;
@@ -1158,7 +1158,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
                             x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                         {
                             cl->armarPaquetePedirDado(PantallaJuego::colorJugador);
@@ -1211,7 +1211,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 
 /**
  * Genera una jugabilidad normal contra la computadora
- * 
+ *
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
 void PantallaJuego::gestionarEventos()
@@ -1264,7 +1264,7 @@ void PantallaJuego::gestionarEventos()
             if (dadosSet)
             {
                 //Turno Valido sin importar los dados
-                if (!PantallaJuego::tablero.turnoGlobalValido(PantallaJuego::turnoJugador))
+                if (PantallaJuego::tablero.turnoGlobalValido(PantallaJuego::turnoJugador) == -1)
                 {
                     noTurno = true;
 
@@ -1306,7 +1306,9 @@ void PantallaJuego::gestionarEventos()
             {
                 if (!dadosSet) //Tirar Dado
                 {
-                    PantallaJuego::tablero.tirarDados();
+                    int num = PantallaJuego::tablero.turnoGlobalValido(turnoJugador);
+
+                    PantallaJuego::tablero.tirarDados(num);
                     PantallaJuego::animacionDado();
 
                     //Revisamos si aun se pueden tirar mas dados
@@ -1394,10 +1396,12 @@ void PantallaJuego::gestionarEventos()
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 && 
+                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
                             x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
                         {
-                            PantallaJuego::tablero.tirarDados();
+                            int num = PantallaJuego::tablero.turnoGlobalValido(turnoJugador);
+
+                            PantallaJuego::tablero.tirarDados(num);
                             PantallaJuego::animacionDado();
 
                             //Revision de si hay mas dados por tirar

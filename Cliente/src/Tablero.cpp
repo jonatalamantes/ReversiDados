@@ -25,13 +25,13 @@ Tablero::Tablero(const Tablero& t)
 Tablero::Tablero(short int fichas[8][8],unsigned short int dados[3])
 {
     for(int i = 0; i < 8; i++)
-    { 
+    {
         for(int j = 0; j < 8;j++)
         {
             if (i == 4 && j == 4)
             {
                 fichas[i][j] = -1;
-            } 
+            }
             else if (i == 4 && j == 5)
             {
                 fichas[i][j] = 1;
@@ -111,7 +111,7 @@ void Tablero::inicializar()
 
 /**
  * Devuelve la cantidad de fichas negras en el tablero
- * 
+ *
  * @return   La cantidad de fichas negras
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
@@ -135,7 +135,7 @@ short Tablero::cantidadNegras()
 
 /**
  * Devuelve la cantidad de fichas blancas en el tablero
- * 
+ *
  * @return   La cantidad de fichas blancas
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
@@ -159,7 +159,7 @@ short Tablero::cantidadBlancas()
 
 /**
  * Pequeña forma de jugar contra una maquina
- * 
+ *
  * @param short   Color del jugador (-1 o 1)
  * @param x       Apuntador resultante donde se coloco el movimiento de X
  * @param y       Apuntador resultante donde se coloco el movimiento de X
@@ -216,13 +216,13 @@ void Tablero::computerMove(short color, short *x, short *y)
 
 /**
  * Valida que exista un turno minimo para el jugador del color
- * sin contemplar los dados
+ * contemplando a los dados
  *
  * @param  color   -1 si es blanco o 1 si es negro
- * @return         Verdadero si puede mover o falso si no
+ * @return         Si puede mover la ficha
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
-bool Tablero::turnoGlobalValido(short color)
+short Tablero::turnoGlobalValido(short color)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -230,18 +230,18 @@ bool Tablero::turnoGlobalValido(short color)
         {
             if (Tablero::validarMovimiento(i,j,color))
             {
-                return true;
+                return j;
             }
         }
     }
 
-    return false;
+    return -1;
 }
 
 /**
  * Valida que exista un turno minimo para el jugador del color
  * contemplando a los dados
- * 
+ *
  * @param  color   -1 si es blanco o 1 si es negro
  * @return         Si puede mover la ficha
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -269,7 +269,7 @@ bool Tablero::turnoValido(short color)
 
 /**
  * Valida un movimiento en una posicion en especifico
- * 
+ *
  * @param  x     Posicion X del tablero del 0-7
  * @param  y     Posicion Y del tablero del 0-7
  * @param  color -1 si es blanco o 1 si es negro
@@ -475,7 +475,7 @@ bool Tablero::validarMovimiento(int x, int y, int color)
 
 /**
  * Se ejecuta la accion de color una ficha en el tablero
- * 
+ *
  * @param x     Posicion X del tablero donde se inserta la ficha 0-7
  * @param y     Posicion Y del tablero donde se inserta la ficha 0-7
  * @param color -1 si es blanco o 1 si es negro
@@ -756,14 +756,19 @@ void Tablero::colocarFicha(int x, int y, int color)
 
 /**
  * Tira los dados generando tres numeros psudo-aleatorios
- * 
+ *
+ * @param forceColor  El primer dado termina con el color que se da menos uno
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
-void Tablero::tirarDados()
+void Tablero::tirarDados(int forceColor)
 {
+    //Tiempo Aleatorio
     srand (time(NULL));
 
-    for (int i = 0; i < 3; i++)
+    dados[0] = forceColor+1;
+
+    //Recorremos los dados para ponerles un numero aleatorio
+    for (int i = 1; i < 3; i++)
     {
         short myval = rand() % 8 + 1;
         dados[i] = myval;
@@ -777,10 +782,9 @@ void Tablero::tirarDados()
         }
     }
 }
-
 /**
  * Revisa si existe un numero en los dados ya puesto evitando repeticiones
- * 
+ *
  * @param  num  Numero a revisar
  * @return      Si ya existe el numero en los dados
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -831,7 +835,7 @@ bool Tablero::TableroIgual(Tablero c)
 
 /**
  * Busca el movimiento que se hizo de un tablero a otro
- * 
+ *
  * @param antes    Tablero antes del movimiento
  * @param despues  Tablero despues del movimiento
  * @param color    Color que se pretendio hacer
@@ -863,7 +867,7 @@ void Tablero::buscarMovimiento(Tablero antes, Tablero despues, short color, int*
 
 /**
  * Empaca la ficha de una casilla de -1, 0, 1 a su version del Protocolo RV
- * 
+ *
  * @param  x  color a cambiar
  * @return    2 si es negro, 1 si es blanco, 0 si no tiene color
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -886,7 +890,7 @@ uint8_t Tablero::standardValor(short int x)
 
 /**
  * Agarra un byte del protocolo RV y lo desempaca en su forma -1, 0, 1
- * 
+ *
  * @param  x  byte a desempacar
  * @return    -1 si es negro, 1 si es blanco, 0 si no tiene color
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -909,7 +913,7 @@ short int Tablero::tableroValor(uint8_t x)
 
 /**
  * Transforma el tablero x su version de 128 bytes
- * 
+ *
  * @param  x Tablero a empaquetar
  * @return   Conjunto de Bytes a enviar
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -926,9 +930,9 @@ uint128_t Tablero::tableroToBytes(Tablero x)
             //Empacamos cuatro casillas en un byte
             uint8_t oneByte;
 
-            oneByte = (standardValor(x.getFicha(i,j)) << 6)   | 
+            oneByte = (standardValor(x.getFicha(i,j)) << 6)   |
                       (standardValor(x.getFicha(i,j+1)) << 4) |
-                      (standardValor(x.getFicha(i,j+2)) << 2) | 
+                      (standardValor(x.getFicha(i,j+2)) << 2) |
                       (standardValor(x.getFicha(i,j+3)));
 
             bytes.byte[contador] = oneByte;
@@ -941,7 +945,7 @@ uint128_t Tablero::tableroToBytes(Tablero x)
 
 /**
  * Transforma un 128 bits en un tablero
- * 
+ *
  * @param  x  Estructura de 128 bits a transformar
  * @return    Tablero resultante
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
