@@ -687,7 +687,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
 {
     Cliente *cl = new Cliente();
 
-    if (pc->getHost() == "" || pc->getPuerto() == "")
+    if (pc->getHost() == "" || pc->getPuerto() == "0")
     {
         pc->imprimirPantalla();
     }

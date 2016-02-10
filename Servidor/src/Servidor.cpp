@@ -33,7 +33,7 @@ Servidor::Servidor()
 
 /**
  * Devuelve el tipo de paquete que recibio el servidor
- * 
+ *
  * @param  bytes    Paquete recogido por el servidor
  * @return          Tipo de paquete segun el protocolo RV
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -76,7 +76,7 @@ int Servidor::procesarHeader(List<uint8_t> bytesRecibidos)
 
 /**
  * Devuelve las banderas para un tipo en el protocolo de RV
- * 
+ *
  * @param  tipo   Tipo de paquete a recobrar las banderas
  * @return        Un byte con las banderas segun el protocolo RV
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
@@ -111,7 +111,7 @@ uint8_t Servidor::empaquetarByte(int tipo)
 
 /**
  * subrutina que se encarga de manipular a un nuevo cliente en el servidor
- * 
+ *
  * @param punteroPartida  Apuntador a EstructuraHilo con los datos de la partida
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
@@ -124,7 +124,10 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
     //Leemos el mensaje
     int res = read(punteroPartida->getDescriptorSocket(), buffer, 255);
 
-    cout << "[" << res << ", " << punteroPartida->getPartida() << "]" << endl;
+    //cout << "[" << res << ", " << punteroPartida->getPartida() << "]" << endl;
+    cout << "[" << "D:1=" << punteroPartida->getPartida()->getDescriptorJ1();
+    cout << ", D:2=" << punteroPartida->getPartida()->getDescriptorJ2();
+    cout << ", Y:=" << punteroPartida->getDescriptorSocket() << "]";
     cout.flush();
 
     if (res < 0)
@@ -170,7 +173,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
         }
 
         //Enviamos el paquete
-        int resWrite = write(punteroPartida->getPartida()->getDescriptorJ1(), 
+        int resWrite = write(punteroPartida->getPartida()->getDescriptorJ1(),
                              bufferPaquete, bytesEnviados.getSize());
 
         if (resWrite < 0)
@@ -178,7 +181,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
             //Error
         }
 
-        resWrite = write(punteroPartida->getPartida()->getDescriptorJ2(), 
+        resWrite = write(punteroPartida->getPartida()->getDescriptorJ2(),
                          bufferPaquete, bytesEnviados.getSize());
 
         if (resWrite < 0)
@@ -219,8 +222,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
             fin = true;
         }
 
-        cout << "< " << punteroPartida->getDescriptorSocket() << " >";
-        cout << "< " << tipo << " >" << endl;
+        //cout << "< " << tipo << " >" << endl;
 
         if (tipo == 2) //Quiero Jugar
         {
@@ -300,9 +302,8 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 }
 
                 //Enviamos el paquete
-                int r = write(punteroPartida->getPartida()->getDescriptorJ1(), 
+                int r = write(punteroPartida->getPartida()->getDescriptorJ1(),
                               bufferPaquete, bytesSaliente1.getSize());
-
                 if (r < 0)
                 {
                     //Error
@@ -353,7 +354,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 }
 
                 //Enviamos el paquete
-                r = write(punteroPartida->getPartida()->getDescriptorJ2(), 
+                r = write(punteroPartida->getPartida()->getDescriptorJ2(),
                           bufferPaquete, bytesSaliente1.getSize());
 
                 if (r < 0)
@@ -415,7 +416,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 }
 
                 //Enviamos el paquete
-                int r = write(punteroPartida->getPartida()->getDescriptorJ1(), 
+                int r = write(punteroPartida->getPartida()->getDescriptorJ1(),
                               bufferPaquete, bytesEnviados.getSize());
 
                 if (r < 0)
@@ -423,7 +424,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                     //Error
                 }
 
-                r = write(punteroPartida->getPartida()->getDescriptorJ2(), 
+                r = write(punteroPartida->getPartida()->getDescriptorJ2(),
                           bufferPaquete, bytesEnviados.getSize());
 
                 if (r < 0)
@@ -449,7 +450,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 }
 
                 //Enviamos el paquete
-                int r = write(punteroPartida->getDescriptorSocket(), 
+                int r = write(punteroPartida->getDescriptorSocket(),
                               bufferPaquete, bytesEnviados.getSize());
 
                 if (r < 0)
@@ -496,7 +497,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                     t->colocarFicha(x,y,jugador);
 
                     //Fin de Juego
-                    if (t->cantidadNegras() + t->cantidadBlancas() == 64 || 
+                    if (t->cantidadNegras() + t->cantidadBlancas() == 64 ||
                         t->cantidadBlancas() == 0 || t->cantidadNegras() == 0)
                     {
                         bytesEnviados.append(Servidor::empaquetarByte(7));
@@ -606,7 +607,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                     }
 
                     //Enviamos el paquete
-                    int r = write(punteroPartida->getPartida()->getDescriptorJ1(), 
+                    int r = write(punteroPartida->getPartida()->getDescriptorJ1(),
                                   bufferPaquete, bytesEnviados.getSize());
 
                     if (r < 0)
@@ -614,7 +615,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                         //Error
                     }
 
-                    r = write(punteroPartida->getPartida()->getDescriptorJ2(), 
+                    r = write(punteroPartida->getPartida()->getDescriptorJ2(),
                               bufferPaquete, bytesEnviados.getSize());
 
                     if (r < 0)
@@ -638,7 +639,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                     }
 
                     //Enviamos el paquete
-                    int r = write(punteroPartida->getDescriptorSocket(), 
+                    int r = write(punteroPartida->getDescriptorSocket(),
                                   bufferPaquete, bytesEnviados.getSize());
 
                     if (r < 0)
@@ -663,7 +664,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 }
 
                 //Enviamos el paquete
-                int r = write(punteroPartida->getDescriptorSocket(), 
+                int r = write(punteroPartida->getDescriptorSocket(),
                               bufferPaquete, bytesEnviados.getSize());
 
                 if (r < 0)
@@ -707,7 +708,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
             }
 
             //Enviamos el paquete
-            int resWrite = write(punteroPartida->getPartida()->getDescriptorJ1(), 
+            int resWrite = write(punteroPartida->getPartida()->getDescriptorJ1(),
                                  bufferPaquete, bytesEnviados.getSize());
 
             if (resWrite < 0)
@@ -715,7 +716,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
                 //Error
             }
 
-            resWrite = write(punteroPartida->getPartida()->getDescriptorJ2(), 
+            resWrite = write(punteroPartida->getPartida()->getDescriptorJ2(),
                              bufferPaquete, bytesEnviados.getSize());
 
             if (resWrite < 0)
@@ -729,10 +730,9 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
             //Señal de final de juego compartida
             punteroPartida->getPartida()->setTurnoJugador(7);
         }
-
     }
 
-    if (fin || punteroPartida->getPartida() == NULL || 
+    if (fin || punteroPartida->getPartida() == NULL ||
         punteroPartida->getPartida()->getTurnoJugador() == 7)
     {
         if (punteroPartida->getPartida() != NULL)
@@ -743,7 +743,7 @@ void Servidor::atenderCliente(EstructuraHilo* punteroPartida)
 }
 
 /**
- * Subrutina para poner al servidor  a correr 
+ * Subrutina para poner al servidor  a correr
  *
  * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
  */
@@ -816,6 +816,7 @@ void Servidor::correr()
     double ptiempo = tiempo;
 
     Partida *w;
+    int contadorEventos;
 
     while (true)
     {
@@ -830,6 +831,14 @@ void Servidor::correr()
         {
             //Transformamos a un número doble la hora
             tiempo = ((double)tv.tv_sec * 1000000 + (double)tv.tv_usec);
+
+            //Imprimimos un punto si han pasado 500 milisegundos
+            if (tiempo - ptiempo > 500000)
+            {
+                cout << '.';
+                cout.flush();
+                ptiempo = tiempo;
+            }
 
             for (unsigned i = 0; i < partidas.getSize(); i++)
             {
@@ -918,17 +927,11 @@ void Servidor::correr()
                     partidas.deleteForPosition(i);
                 }
             }
-
-            //Imprimimos un punto si han pasado 500 milisegundos
-            if (tiempo - ptiempo > 500000)
-            {
-                cout << '.';
-                cout.flush();
-                ptiempo = tiempo;
-            }
         }
 
-        n = poll(descritoresSocket, ultimaCantidad, 75);
+        //memset(descritoresSocket, 0, sizeof(descritoresSocket));
+        n = poll(descritoresSocket, ultimaCantidad, 50);
+        contadorEventos = 0;
 
         if (n < 0)
         {
@@ -938,6 +941,19 @@ void Servidor::correr()
         {
             for (int i = 0; i < ultimaCantidad; i++)
             {
+                //Revisamos que sea el numero indicado de eventos para funcionar
+                if (descritoresSocket[i].revents != 0)
+                {
+                    if (contadorEventos < n)
+                    {
+                        contadorEventos++;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
                 if ((descritoresSocket[i].revents & POLLERR) == POLLERR)
                 {
                     //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
@@ -946,7 +962,7 @@ void Servidor::correr()
                 {
                     //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
                 }
-                else if ((descritoresSocket[i].revents & POLLIN) == POLLIN || 
+                else if ((descritoresSocket[i].revents & POLLIN) == POLLIN ||
                          (descritoresSocket[i].revents & POLLRDNORM) == POLLRDNORM)
                 {
                     //Evento en el servidor principal
@@ -1016,9 +1032,6 @@ void Servidor::correr()
                     }
                     else //Evento en un cliente
                     {
-                        //Buscamos el Cliente que nos esta tratando de escribir
-                        EstructuraHilo *estructura = new EstructuraHilo();
-
                         //buscar el descriptore las partidas
                         int partida = -1;
                         for (unsigned j = 0; j < partidas.getSize(); j++)
@@ -1033,13 +1046,15 @@ void Servidor::correr()
 
                         if (partida != -1)
                         {
+                            //Buscamos el Cliente que nos esta tratando de escribir
+                            EstructuraHilo *estructura = new EstructuraHilo();
+
                             estructura->setPartida(partidas[partida]);
                             estructura->setDescriptorSocket(descritoresSocket[i].fd);
 
                             atenderCliente(estructura);
+                            delete estructura;
                         }
-
-                        delete estructura;
                     }
                 }
             }
