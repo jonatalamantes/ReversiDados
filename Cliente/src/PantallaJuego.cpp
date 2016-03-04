@@ -220,64 +220,91 @@ void PantallaJuego::animacionDado()
 
 void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, short lastY)
 {
-    //Recogemos el tablero
-    Tablero nuevo = PantallaJuego::tablero;
-
-    //Cargamos el tablero antiguo para cargar la animacion junto con el ultimo movimiento
-    PantallaJuego::tablero = antiguo;
-    PantallaJuego::tablero.setFicha(lastX -1, lastY-1,color);
-
-    //Dibujamos
-    dibujarTablero();
-    sleep(1);
-
-    //Establecemos el nuevo tablero
-    PantallaJuego::tablero = nuevo;
-    dibujarTablero();
-
-    //Encontramos el color del ultimo movimiento
-    char fichaC;
-
-    if (color == -1)
-    {
-        fichaC = 'N';
-    }
-    else
-    {
-        fichaC = 'B';
-    }
-
-    //Cargamos la ficha temporal
-    f->cargarFicha(PantallaJuego::ventana, posibleX, posibleY, 'G', "0");
-
-    //Por cada ficha del tablero diferencte cargamos la animacion
-    for (int i = 0; i < 8; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            if (!(i+1 == lastX && j+1 == lastY))
-            {
-                if (PantallaJuego::tablero.getFicha(i,j) != antiguo.getFicha(i,j))
-                {
-                    f->cargarFicha(PantallaJuego::ventana, i+1, j+1, fichaC, "1");
-                }
-            }
-        }
-    }
-
-    //Actualizamos el tablero
-    SDL_UpdateRect(PantallaJuego::ventana, 0, 0, 0, 0);
-
     int cnn = PantallaJuego::tablero.cantidadNegras();
     int cbn = PantallaJuego::tablero.cantidadBlancas();
 
     //Buscamos condiciones de fin de juego
     if ( (cnn + cbn == 64) || (cnn == 0) || (cbn == 0) )
     {
+        Fin = true;
+        dibujarTablero();
+        sleep(1);
+
+        if (cnn > cbn)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    tablero.setFicha(i,j, 1);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    tablero.setFicha(i,j, -1);
+                }
+            }
+        }
+
         dibujarTablero();
     }
+    else
+    {
+        //Recogemos el tablero
+        Tablero nuevo = PantallaJuego::tablero;
 
-    sleep(1);
+        //Cargamos el tablero antiguo para cargar la animacion junto con el ultimo movimiento
+        PantallaJuego::tablero = antiguo;
+        PantallaJuego::tablero.setFicha(lastX -1, lastY-1,color);
+
+        //Dibujamos
+        dibujarTablero();
+        sleep(1);
+
+        //Establecemos el nuevo tablero
+        PantallaJuego::tablero = nuevo;
+        dibujarTablero();
+
+        //Encontramos el color del ultimo movimiento
+        char fichaC;
+
+        if (color == -1)
+        {
+            fichaC = 'N';
+        }
+        else
+        {
+            fichaC = 'B';
+        }
+
+        //Cargamos la ficha temporal
+        f->cargarFicha(PantallaJuego::ventana, posibleX, posibleY, 'G', "0");
+
+        //Por cada ficha del tablero diferencte cargamos la animacion
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (!(i+1 == lastX && j+1 == lastY))
+                {
+                    if (PantallaJuego::tablero.getFicha(i,j) != antiguo.getFicha(i,j))
+                    {
+                        f->cargarFicha(PantallaJuego::ventana, i+1, j+1, fichaC, "1");
+                    }
+                }
+            }
+        }
+
+        //Actualizamos el tablero
+        SDL_UpdateRect(PantallaJuego::ventana, 0, 0, 0, 0);
+
+        sleep(1);
+    }
 }
 
 /**
@@ -1220,6 +1247,7 @@ void PantallaJuego::gestionarEventos()
     srand(time(NULL));
 
     bool endgame = false;
+    bool turnoRevisado = false;
     tablas = false;
     dadosSet = false;
     Fin = false;
@@ -1260,49 +1288,29 @@ void PantallaJuego::gestionarEventos()
                 continue;
             }
 
-            //Validamos que se turno valido o haya tablas
             if (dadosSet)
             {
-                //Turno Valido sin importar los dados
-                if (PantallaJuego::tablero.turnoGlobalValido(PantallaJuego::turnoJugador) == -1)
+                //Validamos movimiento de dados
+                if (!PantallaJuego::tablero.turnoValido(PantallaJuego::turnoJugador))
                 {
                     noTurno = true;
+                    PantallaJuego::tablero.inicializarDados();
+                    dibujarTablero();
+                    sleep(2);
 
-                    if (tablas)
-                    {
-                        Fin = true;
-                        continue;
-                    }
-                    else
-                    {
-                        tablas = true;
-                    }
+                    PantallaJuego::turnoJugador = (-1) * PantallaJuego::turnoJugador;
+                    dadosSet = false;
+
+                    continue;
                 }
-                else
+                else //No puede mover
                 {
-                    tablas = false;
-
-                    //Validamos movimiento de dados
-                    if (!PantallaJuego::tablero.turnoValido(PantallaJuego::turnoJugador))
-                    {
-                        noTurno = true;
-                        PantallaJuego::tablero.inicializarDados();
-                        dibujarTablero();
-                        sleep(2);
-
-                        PantallaJuego::turnoJugador = (-1) * PantallaJuego::turnoJugador;
-                        dadosSet = false;
-
-                        continue;
-                    }
-                    else //No puede mover
-                    {
-                        noTurno = false;
-                    }
+                    noTurno = false;
                 }
             }
 
-            if (PantallaJuego::turnoJugador != PantallaJuego::colorJugador) //Turno Computadora
+            //Revisamos de quien es el turno
+            if (PantallaJuego::turnoJugador != PantallaJuego::colorJugador && turnoRevisado) //Turno Computadora
             {
                 if (!dadosSet) //Tirar Dado
                 {
@@ -1345,12 +1353,13 @@ void PantallaJuego::gestionarEventos()
 
                             PantallaJuego::tablero.inicializarDados();
                             dadosSet = false;
+                            turnoRevisado = false;
                         }
 
                     }
                 }
             }
-            else //Turno del usuario
+            else if (turnoRevisado)//Turno del usuario
             {
                 SDL_WaitEvent(&Evento);
 
@@ -1417,7 +1426,7 @@ void PantallaJuego::gestionarEventos()
                     }
                     else //Hace Movimiento
                     {
-                        if (PantallaJuego::turnoJugador == colorJugador) //Turno Jugador Blancas
+                        if (PantallaJuego::turnoJugador == colorJugador) //Turno Jugador
                         {
                             int tabY = ((y/TAM_CUADRO) - 2);
                             int tabX = ((x/TAM_CUADRO) - 0);
@@ -1442,6 +1451,7 @@ void PantallaJuego::gestionarEventos()
 
                                         PantallaJuego::tablero.inicializarDados();
                                         dadosSet = false;
+                                        turnoRevisado = false;
                                     }
                                 }
                             }
@@ -1463,6 +1473,32 @@ void PantallaJuego::gestionarEventos()
 
                     endgame = true;
                 }
+            }
+            else //Validamos que se turno valido o haya tablas
+            {
+                //Turno Valido sin importar los dados
+                if (PantallaJuego::tablero.turnoGlobalValido(PantallaJuego::turnoJugador) == -1)
+                {
+                    noTurno = true;
+
+                    if (tablas)
+                    {
+                        Fin = true;
+                    }
+                    else
+                    {
+                        tablas = true;
+                        PantallaJuego::turnoJugador = (-1) * PantallaJuego::turnoJugador;
+                    }
+
+                    continue;
+                }
+                else
+                {
+                    tablas = false;
+                }
+
+                turnoRevisado = true;
             }
         }
     }
