@@ -17,7 +17,8 @@ class PantallaJuego
 {
     private:
     ///Atributos
-        SDL_Surface* ventana;
+        SDL_Renderer* renderizador;
+        SDL_Window* window;
         FuncionesPantalla* f;
         Tablero tablero;
         short posibleX;
@@ -33,7 +34,7 @@ class PantallaJuego
 
     public:
     ///Constructor
-        PantallaJuego(SDL_Surface* v, FuncionesPantalla* f);
+        PantallaJuego(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f);
 
     ///Setters
         void setNombreJugador1(string j);
@@ -72,7 +73,7 @@ class PantallaJuego
 
         /**
          * Genera una animacion entre el tablero antiguo y el actual de las fichas cambiadas
-         
+
          * @param antiguo  Tablero antiguo antes del movimiento
          * @param color    Color que cambiara
          * @param lastX    Ultima posicion X donde estaba la ficha del movimiento
@@ -83,7 +84,7 @@ class PantallaJuego
 
         /**
          * Dibuja a Reversi-chan segun el estado (ver imagenes)
-         * 
+         *
          * @param estado  Imagen de Reversi-chan a cargar
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
          */
@@ -91,14 +92,14 @@ class PantallaJuego
 
         /**
          * Genera una jugabilidad normal contra la computadora
-         * 
+         *
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
          */
         void gestionarEventos();
 
         /**
          * Genera una partida en Red entre dos jugadores usando el protocolo RV
-         * 
+         *
          * @param clienteRcv   Apuntador del Cliente con el socket asociado
 		 * @author Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
          */

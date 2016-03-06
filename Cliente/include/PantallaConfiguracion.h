@@ -1,7 +1,8 @@
 #ifndef PANTALLACONFIGURACION_H
 #define PANTALLACONFIGURACION_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include "FuncionesPantalla.h"
 
@@ -16,7 +17,8 @@ class PantallaConfiguracion
 {
     private:
     ///Atributos
-        SDL_Surface* ventana;
+        SDL_Renderer* renderizador;
+        SDL_Window* window;
         string nombreJugador;
         string hostJugador;
         string puerto;
@@ -24,7 +26,7 @@ class PantallaConfiguracion
         FuncionesPantalla* f;
 
     //Funcion de la pantalla
-    
+
         /**
          * Refresca el contenido de la ventana interna para mostrar
          *
@@ -34,8 +36,8 @@ class PantallaConfiguracion
 
     public:
     ///Constructores
-        PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f);
-        PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, 
+        PantallaConfiguracion(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f);
+        PantallaConfiguracion(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f, string nj,
                               string hj, string p);
 
         //Destructor

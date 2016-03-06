@@ -1,5 +1,5 @@
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <cctype>
 #include "FuncionesPantalla.h"
@@ -7,9 +7,10 @@
 #include "Constantes.h"
 
 ///Constructores
-PantallaConfiguracion::PantallaConfiguracion(SDL_Surface* vent, FuncionesPantalla* f)
+PantallaConfiguracion::PantallaConfiguracion(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f)
 {
-    PantallaConfiguracion::ventana = vent;
+    PantallaConfiguracion::window = win;
+    PantallaConfiguracion::renderizador = ren;
     PantallaConfiguracion::hostJugador = "";
     PantallaConfiguracion::nombreJugador = "J1";
     PantallaConfiguracion::puerto = "0";
@@ -17,19 +18,23 @@ PantallaConfiguracion::PantallaConfiguracion(SDL_Surface* vent, FuncionesPantall
     PantallaConfiguracion::f = f;
 }
 
-PantallaConfiguracion::PantallaConfiguracion(SDL_Surface * vent, FuncionesPantalla* f, string nj, 
+PantallaConfiguracion::PantallaConfiguracion(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f, string nj,
                                              string hj, string p)
 {
-    PantallaConfiguracion::ventana = vent;
+    PantallaConfiguracion::window = win;
+    PantallaConfiguracion::renderizador = ren;
     PantallaConfiguracion::hostJugador = hj;
     PantallaConfiguracion::nombreJugador = nj;
     PantallaConfiguracion::puerto = p;
     PantallaConfiguracion::opcionMenu = 1;
+    PantallaConfiguracion::f = f;
 }
 
 PantallaConfiguracion::~PantallaConfiguracion()
 {
-    PantallaConfiguracion::ventana = NULL;
+    PantallaConfiguracion::window = NULL;
+    PantallaConfiguracion::renderizador = NULL;
+    PantallaConfiguracion::f = NULL;
 }
 
 ///Getters
@@ -73,21 +78,47 @@ void PantallaConfiguracion::setPuerto(string x)
  */
 void PantallaConfiguracion::imprimirPantallaInterna()
 {
+    int iW, iH;
+    SDL_Color color;
+    SDL_Texture* tex;
+    SDL_GetWindowSize(window, &iW, &iH);
     SDL_Rect areai;
     SDL_Rect areae;
-    Uint32 color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 0,0,0); //negro
-    Uint32 colorIn = SDL_MapRGB(PantallaConfiguracion::ventana->format, 200,200,200); //gris
-    Uint32 colorAc = SDL_MapRGB(PantallaConfiguracion::ventana->format, 250,200,0); //amarillo 
+    SDL_Rect r;
 
     //Rellenamos de negro el tablero
-    SDL_FillRect(PantallaConfiguracion::ventana, NULL, color);
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //negro
+    r.x = 0;
+    r.y = 0;
+    r.h = iH;
+    r.w = iW;
 
-    f->escribirPalabra(ventana, "Reversi", 15, 48, "Blazed", 60, 255, 0, 0);
-    
+    SDL_RenderFillRect(renderizador, &r);
+
+    //Escribimos la palabra de Reversi
+    color.r = 255;
+    color.g = 0;
+    color.b = 0;
+    tex = f->renderizarTexto("Reversi", "Blazed", color, 60, renderizador);
+    f->renderizarTextura(tex, renderizador, 15, 48);
+    SDL_DestroyTexture(tex);
+
     //Insertamos las etiquetas de las configuraciones
-    f->escribirPalabra(ventana, "Nombre Jugador", 90, 170, "Arcarde", 20, 255, 255, 0);
-    f->escribirPalabra(ventana, "Host o IP a conectar", 70, 250, "Arcarde", 20, 255, 255, 0);
-    f->escribirPalabra(ventana, "Puerto a conectar", 80, 330, "Arcarde", 20, 255, 255, 0);
+    color.r = 255;
+    color.g = 255;
+    color.b = 0;
+
+    tex = f->renderizarTexto("Nombre Jugador", "Arcarde", color, 20, renderizador);
+    f->renderizarTextura(tex, renderizador, 90, 170);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("Host o IP a conectar", "Arcarde", color, 20, renderizador);
+    f->renderizarTextura(tex, renderizador, 70, 250);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("Puerto a conectar", "Arcarde", color, 20, renderizador);
+    f->renderizarTextura(tex, renderizador, 80, 330);
+    SDL_DestroyTexture(tex);
 
     //Area del cuadro de texto NJ
     areae.x = 20;
@@ -95,7 +126,6 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     areae.w = 325;
     areae.h = 40;
 
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 0, 0, 0); //Negro
     areai.x = 25;
     areai.y = 200;
     areai.w = 315;
@@ -103,27 +133,41 @@ void PantallaConfiguracion::imprimirPantallaInterna()
 
     if (PantallaConfiguracion::opcionMenu == 1)
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(ventana, PantallaConfiguracion::nombreJugador + "_", 30, 200, 
-                           "Digital", 25, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 250, 200, 0, 255); //Amarillo
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(nombreJugador + "_", "Digital", color, 25, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 200);
+        SDL_DestroyTexture(tex);
     }
     else
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::nombreJugador, 
-                          30, 200, "Digital", 25, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 200, 200, 200, 255); //Gris
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(nombreJugador, "Digital", color, 25, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 200);
+        SDL_DestroyTexture(tex);
     }
 
     //Area del cuadro de texto HC
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 200, 200, 200); //Gris
     areae.x = 20;
     areae.y = 275;
     areae.w = 325;
     areae.h = 40;
 
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 0, 0, 0); //Negro
     areai.x = 25;
     areai.y = 280;
     areai.w = 315;
@@ -131,27 +175,41 @@ void PantallaConfiguracion::imprimirPantallaInterna()
 
     if (PantallaConfiguracion::opcionMenu == 2)
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador + "_", 
-                           30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 250, 200, 0, 255); //Amarillo
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(hostJugador + "_", "Digital", color, 25, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 280);
+        SDL_DestroyTexture(tex);
     }
     else
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::hostJugador, 
-                           30, 280, "Digital", 25, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 200, 200, 200, 255); //Gris
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(hostJugador, "Digital", color, 25, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 280);
+        SDL_DestroyTexture(tex);
     }
 
     //Area del cuadro de texto Puerto
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 200, 200, 200); //Gris
     areae.x = 20;
     areae.y = 355;
     areae.w = 325;
     areae.h = 40;
 
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 0, 0, 0); //Negro
     areai.x = 25;
     areai.y = 360;
     areai.w = 315;
@@ -159,27 +217,41 @@ void PantallaConfiguracion::imprimirPantallaInterna()
 
     if (PantallaConfiguracion::opcionMenu == 3)
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto + "_", 
-                           30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 250, 200, 0, 255); //Amarillo
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(puerto + "_", "Digital", color, 30, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 360);
+        SDL_DestroyTexture(tex);
     }
     else
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
-        f->escribirPalabra(PantallaConfiguracion::ventana, PantallaConfiguracion::puerto, 
-                           30, 360, "Digital", 30, 169, 255, 118); //Verde Claro
+        SDL_SetRenderDrawColor(renderizador, 200, 200, 200, 255); //Gris
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //Negro
+        SDL_RenderFillRect(renderizador, &areai);
+
+        color.r = 169;
+        color.g = 255;
+        color.b = 118;
+        tex = f->renderizarTexto(puerto, "Digital", color, 30, renderizador);
+        f->renderizarTextura(tex, renderizador, 30, 360);
+        SDL_DestroyTexture(tex);
     }
 
     //Area del Boton de Salir
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 200, 200, 200); //Gris
     areae.x = 100;
     areae.y = 420;
     areae.w = 170;
     areae.h = 40;
 
-    color = SDL_MapRGB(PantallaConfiguracion::ventana->format, 4, 74, 116); //Azul
     areai.x = 105;
     areai.y = 425;
     areai.w = 160;
@@ -187,20 +259,30 @@ void PantallaConfiguracion::imprimirPantallaInterna()
 
     if (PantallaConfiguracion::opcionMenu == 4)
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorAc);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
+        SDL_SetRenderDrawColor(renderizador, 250, 200, 0, 255); //Amarillo
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 4, 74, 116, 255); //Azul
+        SDL_RenderFillRect(renderizador, &areai);
     }
     else
     {
-        SDL_FillRect(PantallaConfiguracion::ventana, &areae, colorIn);
-        SDL_FillRect(PantallaConfiguracion::ventana, &areai, color);
+        SDL_SetRenderDrawColor(renderizador, 200, 200, 200, 255); //Amarillo
+        SDL_RenderFillRect(renderizador, &areae);
+
+        SDL_SetRenderDrawColor(renderizador, 4, 74, 116, 255); //Azul
+        SDL_RenderFillRect(renderizador, &areai);
     }
 
-    f->escribirPalabra(PantallaConfiguracion::ventana, "Guardar", areai.x + 35, areai.y + 2, 
-                       "Arcarde", 20, 255, 255, 255);
+    color.r = 255;
+    color.g = 255;
+    color.b = 255;
+    tex = f->renderizarTexto("Guardar", "Arcarde", color, 20, renderizador);
+    f->renderizarTextura(tex, renderizador, areai.x + 35, areai.y + 2);
+    SDL_DestroyTexture(tex);
 
     //Actualizamos la pantalla
-    SDL_UpdateRect(PantallaConfiguracion::ventana, 0, 0, 0, 0);
+    SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -211,13 +293,18 @@ void PantallaConfiguracion::imprimirPantallaInterna()
 void PantallaConfiguracion::imprimirPantalla()
 {
     SDL_Event Evento;
-    bool Fin = false, shift = false;
+    bool Fin = false;
+
+    SDL_StartTextInput();
 
     while (!Fin)
     {
         PantallaConfiguracion::imprimirPantallaInterna();
 
-        SDL_WaitEvent(&Evento);
+        if (not SDL_PollEvent(&Evento))
+        {
+            continue;
+        }
 
         if (Evento.type == SDL_MOUSEBUTTONDOWN)
         {
@@ -243,11 +330,8 @@ void PantallaConfiguracion::imprimirPantalla()
         }
         else if (Evento.type == SDL_KEYDOWN)
         {
-            if (Evento.key.keysym.sym == SDLK_RSHIFT || Evento.key.keysym.sym == SDLK_LSHIFT)
-            {
-                shift = true;
-            }
-            else if (Evento.key.keysym.sym == 13) //Enter
+            if (Evento.key.keysym.sym == SDLK_RETURN ||
+                Evento.key.keysym.sym == SDLK_KP_ENTER) //Enter
             {
                 if (PantallaConfiguracion::opcionMenu == 4)
                 {
@@ -269,6 +353,12 @@ void PantallaConfiguracion::imprimirPantalla()
                     PantallaConfiguracion::opcionMenu = 3;
                 }
             }
+            else if (Evento.key.keysym.sym == SDLK_TAB) //Tab
+            {
+                int opcion = PantallaConfiguracion::opcionMenu % 4;
+                opcion++;
+                PantallaConfiguracion::opcionMenu = opcion;
+            }
             else if (Evento.key.keysym.sym == SDLK_DOWN) //Boton Abajo
             {
                 if (PantallaConfiguracion::opcionMenu == 1)
@@ -284,104 +374,47 @@ void PantallaConfiguracion::imprimirPantalla()
                     PantallaConfiguracion::opcionMenu = 4;
                 }
             }
-            else
+            else if (Evento.key.keysym.sym == SDLK_BACKSPACE) //Boton Abajo
             {
-                int c = Evento.key.keysym.sym;
-
                 if (PantallaConfiguracion::opcionMenu == 1)
                 {
-                    string palabra = PantallaConfiguracion::nombreJugador;
-
-                    if (c == 8) //backspace
-                    {
-                        if (palabra.size() != 0)
-                        {
-                            palabra = palabra.substr(0, palabra.size()-1);
-                        }
-                    }
-                    else if (isdigit(c) || isupper(c) || islower(c))
-                    {
-                        if (shift)
-                        {
-                            palabra.push_back(toupper(c));
-                        }
-                        else
-                        {
-                            palabra.push_back(c);
-                        }
-                    }
-
-                    palabra = palabra.substr(0, MAX_CHAR_TEXTBOX);
-
-                    PantallaConfiguracion::nombreJugador = palabra;
+                    nombreJugador = nombreJugador.substr(0, nombreJugador.size()-1);
                 }
                 else if (PantallaConfiguracion::opcionMenu == 2)
                 {
-                    string palabra = PantallaConfiguracion::hostJugador;
-
-                    if (c == 8) //backspace
-                    {
-                        if (palabra.size() != 0)
-                        {
-                            palabra = palabra.substr(0, palabra.size()-1);
-                        }
-                    }
-                    else if (isdigit(c) || islower(c) || isupper(c) || c == '.')
-                    {
-                        if (shift)
-                        {
-                            palabra.push_back(toupper(c));
-                        }
-                        else
-                        {
-                            palabra.push_back(c);
-                        }
-                    }
-                    else if (c >= 256 && c <= 265)
-                    {
-                        palabra.push_back('0' + (c-256));
-                    }
-                    else if (c == 266)
-                    {
-                        palabra.push_back('.');
-                    }
-
-
-                    palabra = palabra.substr(0, MAX_CHAR_TEXTBOX);
-
-                    PantallaConfiguracion::hostJugador = palabra;
+                    hostJugador = hostJugador.substr(0, hostJugador.size()-1);
                 }
                 else if (PantallaConfiguracion::opcionMenu == 3)
                 {
-                    string palabra = PantallaConfiguracion::puerto;
-
-                    if (c == 8) //backspace
-                    {
-                        if (palabra.size() != 0)
-                        {
-                            palabra = palabra.substr(0, palabra.size()-1);
-                        }
-                    }
-                    else if (isdigit(c))
-                    {
-                        palabra.push_back(c);
-                    }
-                    else if (c >= 256 && c <= 265)
-                    {
-                        palabra.push_back('0' + (c-256));
-                    }
-
-                    palabra = palabra.substr(0, MAX_CHAR_TEXTBOX);
-
-                    PantallaConfiguracion::puerto = palabra;
+                    puerto = puerto.substr(0, puerto.size()-1);
                 }
             }
         }
-        else if (Evento.type == SDL_KEYUP)
+        else if (Evento.type == SDL_TEXTINPUT)
         {
-            if (Evento.key.keysym.sym == SDLK_RSHIFT || Evento.key.keysym.sym == SDLK_LSHIFT)
+            string nuevaLetra = Evento.text.text;
+
+            if (opcionMenu == 1)
             {
-                shift = false;
+                if (nuevaLetra.size() < 2 && isalnum(nuevaLetra.at(0)) && nombreJugador.size() < 16)
+                {
+                    nombreJugador = nombreJugador + nuevaLetra;
+                }
+            }
+            else if (opcionMenu == 2)
+            {
+                if (nuevaLetra.size() < 2 && hostJugador.size() < 25 &&
+                    (isalnum(nuevaLetra[0]) || nuevaLetra[0] == '.'))
+                {
+                    hostJugador = hostJugador + nuevaLetra;
+                }
+            }
+            else if (opcionMenu == 3)
+            {
+                if (nuevaLetra.size() < 2 && puerto.size() < 7 && isdigit(nuevaLetra[0]))
+                {
+                    puerto = puerto + nuevaLetra;
+                }
             }
         }
         else if (Evento.type == SDL_QUIT)
@@ -389,5 +422,7 @@ void PantallaConfiguracion::imprimirPantalla()
             Fin = true;
         }
     }
+
+    SDL_StopTextInput();
 }
 

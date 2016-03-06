@@ -232,6 +232,10 @@ class List
     //Atributos
         NodeDouble<T>* firstNode;
         NodeDouble<T>* lastNode;
+
+        mutable NodeDouble<T>* lastSearchNode;
+        mutable unsigned lastSearchPosition;
+
         unsigned Size;
 
     public:
@@ -355,6 +359,13 @@ class List
         unsigned countElement(T thing);
         //Devuelve la cantidad de veces que aparece el elemento 'thing' en la lista
 
+        void shiftLeft();
+        //Recorre las posiciones de la lista a la izquierda y el primer elemento lo pone al final
+
+        void shiftRight();
+        //Recorre las posiciones de la lista a la derecha y el ultimo elemento lo pone al inicio
+
+
     private:
         void quickSort(NodeDouble<T>** a, int began, int latest, short atribute);
         //ordena la lista con el método de quicksort moviendo pibote
@@ -378,6 +389,8 @@ List<T>::List()
     //inicializamos todo en 0
     List<T>::firstNode = NULL;
     List<T>::lastNode = NULL;
+    List<T>::lastSearchNode = NULL;
+    List<T>::lastSearchPosition = 0;
     List<T>::Size = 0;
 }
 
@@ -523,24 +536,17 @@ void List<T>::insertElement(unsigned position, T thing)
         //el tercer elemento tendra los datos del nuevo nodo
         temp3->setData(thing);
 
-        unsigned int counter[2];
-
-        counter[0] = 0;
-        counter[1] = 0;
+        unsigned int counter = 0;
 
         //vamos haciendo un contador de modo que el primer de los elementos creado apunte a un nodo menor a la posicion
-        while (counter[0] < position - 1)
+        while (counter < position - 1)
         {
             temp1 = temp1->getNext();
-            counter[0]++;
+            counter++;
         }
 
         //mientras que con el otro hacemos que el segundo elemento apunte a el nodo mayor a la posicion
-        while (counter[1] < position)
-        {
-            temp2 = temp2->getNext();
-            counter[1]++;
-        }
+        temp1 = temp1->getNext();
 
         //se direciona el elemento 1 de modo que apunte al 3° que es el que contiene los datos
         //mientras que se diracciona al 3° al 2° que era el elemento anterior al que estaba la posicion
@@ -560,6 +566,9 @@ void List<T>::insertElement(unsigned position, T thing)
 
         List<T>::Size = List<T>::Size + 1;
     }
+
+    lastSearchNode = NULL;
+    lastSearchPosition = 0;
 }
 
 template<class T>
@@ -638,6 +647,9 @@ void List<T>::insertElement(NodeDouble<T>* position, T thing)
         //aumentamos la ponderacion
         List<T>::Size = List<T>::Size + 1;
     }
+
+    lastSearchNode = NULL;
+    lastSearchPosition = 0;
 }
 
 template<class T>
@@ -707,6 +719,9 @@ void List<T>::deleteForPosition(unsigned position)
             delete temp;
         }
     }
+
+    lastSearchNode = NULL;
+    lastSearchPosition = 0;
 }
 
 template<class T>
@@ -771,6 +786,9 @@ void List<T>::deleteForPosition(NodeDouble<T>* position)
             List<T>::Size = List<T>::Size - 1;
         }
     }
+
+    lastSearchNode = NULL;
+    lastSearchPosition = 0;
 }
 
 template<class T>
@@ -847,15 +865,118 @@ T List<T>::recover(unsigned position) const
     }
     else
     {
-        //creamos un nuevo nodo
-        NodeDouble<T>* temp = List<T>::firstNode;
-        unsigned int x = 0;
+        //Creamos un nuevo nodo
+        NodeDouble<T>* temp = NULL;
 
-        //buscamos en la lista linealmente la posicion
-        while (x < position)
+        if (List<T>::lastSearchNode == NULL || List<T>::lastSearchPosition <= 0)
         {
-            temp = temp->getNext();
-            x++;
+            if (position < (List<T>::Size/2)) //Explora por lado izquierdo
+            {
+                unsigned int x = 0;
+                temp = List<T>::firstNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x < position)
+                {
+                    temp = temp->getNext();
+                    x++;
+                }
+            }
+            else //Explora por lado derecho
+            {
+                unsigned int x = List<T>::Size-1;
+                temp = List<T>::lastNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x > position)
+                {
+                    temp = temp->getPrev();
+                    x--;
+                }
+            }
+
+            List<T>::lastSearchNode = temp;
+            List<T>::lastSearchPosition = position;
+        }
+        else
+        {
+            //Revisamos cual de los tres nodos llega primero
+            int primero = position;
+            int medio;
+            int ultimo = Size - 1 - position;
+            bool izq;
+
+            if (lastSearchPosition > position) //A la derecha del ultimo buscado esta el actual buscado
+            {
+                medio = lastSearchPosition - position;
+                izq = false;
+            }
+            else //A la derecha del ultimo nodo
+            {
+                medio = position - lastSearchPosition;
+                izq = true;
+            }
+
+            //cout << primero << " " << medio << " " << ultimo << endl;
+
+            if (medio == 0)
+            {
+                temp = lastSearchNode;
+            }
+            else if (primero < medio && primero < ultimo) //llega primero el primero
+            {
+                unsigned int x = 0;
+                temp = List<T>::firstNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x < position)
+                {
+                    temp = temp->getNext();
+                    x++;
+                }
+            }
+            else if (ultimo < medio && ultimo < medio) //llega primero el ultimo
+            {
+                unsigned int x = List<T>::Size-1;
+                temp = List<T>::lastNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x > position)
+                {
+                    temp = temp->getPrev();
+                    x--;
+                }
+            }
+            else //Llega primero el de en medio
+            {
+                if (not izq)
+                {
+                    unsigned int x = lastSearchPosition;
+                    temp = List<T>::lastSearchNode;
+
+                    //buscamos en la lista linealmente la posicion
+                    while (x > position)
+                    {
+                        temp = temp->getPrev();
+                        x--;
+                    }
+                }
+                else
+                {
+                    unsigned int x = lastSearchPosition;
+                    temp = List<T>::lastSearchNode;
+
+                    //buscamos en la lista linealmente la posicion
+                    while (x < position)
+                    {
+                        temp = temp->getNext();
+                        x++;
+                    }
+                }
+            }
+
+            List<T>::lastSearchNode = temp;
+            List<T>::lastSearchPosition = position;
         }
 
         //regresamos el dato que haya en esa posicion
@@ -1344,6 +1465,20 @@ void List<T>::otherQuickSort(NodeDouble<T>** a, int inicio, int fin)
 }
 
 template<class T>
+void List<T>::shiftLeft()
+{
+    T element = List<T>::popFront();
+    List<T>::pushBack(element);
+}
+
+template<class T>
+void List<T>::shiftRight()
+{
+    T element = List<T>::popBack();
+    List<T>::pushFront(element);
+}
+
+template<class T>
 void List<T>::reverseList() //ordena
 {
     //creamos un arreglo de apuntadores que contenga la direccion de cada nodo
@@ -1535,30 +1670,129 @@ ostream& operator << (ostream& os, const List<T>& lista)
 template<class T>
 T& List<T>::operator[] (unsigned position)
 {
-    if (List<T>::isEmpty() || position >= List<T>::Size) //invalida
+    if (List<T>::isEmpty() || position <  0 || position >= List<T>::Size) //invalida
     {
         throw ListException("Error, no puede acceder al elemento en la posicion indicada");
     }
     else
     {
-        //creamos un nuevo nodo
-        NodeDouble<T>* temp = List<T>::firstNode;
-        unsigned int x = 0;
+        //Creamos un nuevo nodo
+        NodeDouble<T>* temp = NULL;
 
-        //buscamos en la lista linealmente la posicion
-        while (x < position)
+        if (List<T>::lastSearchNode == NULL)
         {
-            temp = temp->getNext();
-            x++;
+            if (position < (List<T>::Size/2)) //Explora por lado izquierdo
+            {
+                unsigned int x = 0;
+                temp = List<T>::firstNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x < position)
+                {
+                    temp = temp->getNext();
+                    x++;
+                }
+            }
+            else //Explora por lado derecho
+            {
+                unsigned int x = List<T>::Size-1;
+                temp = List<T>::lastNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x > position)
+                {
+                    temp = temp->getPrev();
+                    x--;
+                }
+            }
+
+            List<T>::lastSearchNode = temp;
+            List<T>::lastSearchPosition = position;
+        }
+        else
+        {
+            //Revisamos cual de los tres nodos llega primero
+            int primero = position;
+            int medio;
+            int ultimo = Size - 1 - position;
+            bool izq;
+
+            if (lastSearchPosition > position) //A la derecha del ultimo buscado esta el actual buscado
+            {
+                medio = lastSearchPosition - position;
+                izq = false;
+            }
+            else //A la derecha del ultimo nodo
+            {
+                medio = position - lastSearchPosition;
+                izq = true;
+            }
+
+            //cout << primero << " " << medio << " " << ultimo << endl;
+
+            if (medio == 0)
+            {
+                temp = lastSearchNode;
+            }
+            else if (primero < medio && primero < ultimo) //llega primero el primero
+            {
+                unsigned int x = 0;
+                temp = List<T>::firstNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x < position)
+                {
+                    temp = temp->getNext();
+                    x++;
+                }
+            }
+            else if (ultimo < medio && ultimo < medio) //llega primero el ultimo
+            {
+                unsigned int x = List<T>::Size-1;
+                temp = List<T>::lastNode;
+
+                //buscamos en la lista linealmente la posicion
+                while (x > position)
+                {
+                    temp = temp->getPrev();
+                    x--;
+                }
+            }
+            else //Llega primero el de en medio
+            {
+                if (not izq)
+                {
+                    unsigned int x = lastSearchPosition;
+                    temp = List<T>::lastSearchNode;
+
+                    //buscamos en la lista linealmente la posicion
+                    while (x > position)
+                    {
+                        temp = temp->getPrev();
+                        x--;
+                    }
+                }
+                else
+                {
+                    unsigned int x = lastSearchPosition;
+                    temp = List<T>::lastSearchNode;
+
+                    //buscamos en la lista linealmente la posicion
+                    while (x < position)
+                    {
+                        temp = temp->getNext();
+                        x++;
+                    }
+                }
+            }
+
+            List<T>::lastSearchNode = temp;
+            List<T>::lastSearchPosition = position;
         }
 
         //regresamos el dato que haya en esa posicion
         return temp->getReferenceData();
     }
-
-    //sino creamos un nuevo nodo y enviaremos basura, esto para que no aparezca un warning
-    NodeDouble<T>* temp = NULL;
-    return temp->getReferenceData();
 }
 
 template<class T>

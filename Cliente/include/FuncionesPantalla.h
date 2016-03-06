@@ -1,7 +1,9 @@
 #ifndef FUNCIONESPANTALLA_H
 #define FUNCIONESPANTALLA_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include "List.h"
 #include "Fuente.h"
@@ -28,106 +30,66 @@ class FuncionesPantalla
         string getPath();
 
     ///Funciones útiles para SDL
+    
+    	/**
+    	 * Carga una textura a partir de un archivo de imagen
+    	 *
+    	 * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+    	 * @param  file    Nombre del archivo a abrir
+    	 * @param  ren     Renderizador
+    	 * @return         Textura resultante o NULL
+    	 */
+        SDL_Texture* cargarTextura(string file, SDL_Renderer *ren);
 
         /**
-         * Escriba una palabra en la pantalla de SDL
+         * Crea una Textura de un texto en específico
          *
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param Pantalla     Apuntador para la pantalla de SDL
-         * @param palabra      Palabra que se desea poner en la pantalla
-         * @param x            Posicion X de la pantalla
-         * @param y            Posicion Y de la pantalla
-         * @param nombreFuente Nombre de la fuente en la carpeta "fonts" sin el .ttf
-         * @param tamFuente    Tamaño de la fuente a poner en pantalla
-         * @param r            Escala RGB tomando la 'R' para el color
-         * @param g            Escala RGB tomando la 'G' para el color
-         * @param b            Escala RGB tomando la 'B' para el color
+         * @param  message  Texto a Renderizar
+         * @param  fontFile Nombre del archivo de la fuente
+         * @param  color    Color que se usará
+         * @param  fontSize Tamaño de la fuente
+         * @param  renderer Renderizador
+         * @return          Textura creada o NULL
          */
-        void escribirPalabra(SDL_Surface* Pantalla, string palabra, int x, int y,
-                            string nombreFuente, int tamFuente, Uint8 r, Uint8 g, Uint8 b);
+        SDL_Texture* renderizarTexto(string message, string fontFile, SDL_Color color, int fontSize, 
+        						     SDL_Renderer *renderer);
 
         /**
-         * Escriba una palabra en la pantalla de SDL
+         * Copia una Textura en la memoria de un Renderizador
          *
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param Pantalla     Apuntador para la pantalla de SDL
-         * @param palabra      Palabra que se desea poner en la pantalla
-         * @param x            Posicion X de la pantalla
-         * @param y            Posicion Y de la pantalla
-         * @param nombreFuente Nombre de la fuente en la carpeta "fonts" sin el .ttf
-         * @param tamFuente    Tamaño de la fuente a poner en pantalla
+         * @param  tex Textura a poner en el Renderizador
+         * @param  ren Renderizador Objetivo
+         * @param  x   Posicion X del objetivo
+         * @param  y   Posicion Y del objetivo
+         * @param  w   Tamaño del largo de la textura
+         * @param  h   Tamaño del alto de la textura
          */
-        void escribirPalabra(SDL_Surface* Pantalla, string palabra, int x, int y,
-                             string nombreFuente, int tamFuente);
+        void renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h);
 
         /**
-         * Escriba una palabra en la pantalla de SDL
+         * Copia una Textura en la memoria de un Renderizador
          *
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param Pantalla     Apuntador para la pantalla de SDL
-         * @param palabra      Palabra que se desea poner en la pantalla
-         * @param x            Posicion X de la pantalla
-         * @param y            Posicion Y de la pantalla
-         * @param nombreFuente Nombre de la fuente en la carpeta "fonts" sin el .ttf
-         * @param tamFuente    Tamaño de la fuente a poner en pantalla
-         * @param r            Escala RGB tomando la 'R' para el color
-         * @param g            Escala RGB tomando la 'G' para el color
-         * @param b            Escala RGB tomando la 'B' para el color
-         * @param w            Apuntador donde se guardará la longitud de la palabra en la pantalla
-         * @param h            Apuntador donde se guardará la altitud de la palabra en la pantalla
+         * @param  tex Textura a poner en el Renderizador
+         * @param  ren Renderizador Objetivo
+         * @param  x   Posicion X del objetivo
+         * @param  y   Posicion Y del objetivo
          */
-        void escribirPalabra(SDL_Surface* Pantalla, string palabra, int x, int y,
-                             string nombreFuente, int tamFuente, Uint8 r, Uint8 g, Uint8 b,
-                             int *w, int *h);
-        /**
-         * Inserte una imagen en la pantalla
-         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param  Pantalla Apuntador con la direccion de la pantalla en SDL
-         * @param  nombre   Nombre de la imagen a cargar
-         * @param  X        Posicion X en la pantalla a insertar la imagen
-         * @param  Y        Posicion Y en la pantalla a insertar la imagen
-         * @return          Si fue posible cargar la imagen
-         */
-        bool cargarImagen(SDL_Surface* Pantalla, string nombre, int X, int Y);
-
-        /**
-         * Inserte una imagen en la pantalla
-         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param  Pantalla Apuntador con la direccion de la pantalla en SDL
-         * @param  nombre   Nombre de la imagen a cargar
-         * @param  X        Posicion X en la pantalla a insertar la imagen
-         * @param  Y        Posicion Y en la pantalla a insertar la imagen
-         * @param  tamX     Apuntador donde se guardara la longitud de la imagen
-         * @param  tamY     Apuntador donde se guardara la altutud de la imagen
-         * @return          Si fue posible cargar la imagen
-         */
-        bool cargarImagen(SDL_Surface* Pantalla, string nombre, int X, int Y, int* tamX, int* tamY);
-
-        /**
-         * Dibuje un circulo en la pantalla
-         *
-         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param Pantalla Apuntador con la direccion de la pantalla en SDL
-         * @param radio    Radio en pixeles que tendra el circulo
-         * @param x        Posicion X en donde se comenzará a evaluar e lcirculo
-         * @param y        Posicion Y donde se comenzará a evaluar el circulo
-         * @param r        Escala RGB tomando la 'R' para el color
-         * @param g        Escala RGB tomando la 'G' para el color
-         * @param b        Escala RGB tomando la 'B' para el color
-         */
-        void dibujarCirculo(SDL_Surface* Pantalla, int radio, int x, int y, int r, int g, int b);
-
+        void renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren, int x, int y);
+        
         /**
          * Carga la imagen de una ficha segun el estado
          *
          * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
-         * @param Pantalla Apuntador con la direccion de la pantalla en SDL
+         * @param Renderer Apuntador con la direccion del renderizador en SDL
          * @param fila     Fila donde poner la ficha (0-7)
          * @param columna  Columna donde poner la ficha (0-7)
          * @param tipo     'B' para Blanco o 'N' para negro
          * @param estado   Estado de la ficha
          */
-        void cargarFicha(SDL_Surface* Pantalla, int fila, int columna, char tipo, string estado);
+        void cargarFicha(SDL_Renderer* ren, int fila, int columna, char tipo, string estado);
 };
 
 #endif // FUNCIONESPANTALLA_H

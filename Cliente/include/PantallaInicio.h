@@ -1,7 +1,8 @@
 #ifndef PANTALLAINICIO_H
 #define PANTALLAINICIO_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "FuncionesPantalla.h"
 
 /**
@@ -13,7 +14,8 @@ class PantallaInicio
 {
     private:
     ///Atributos
-        SDL_Surface* ventana;
+        SDL_Renderer* renderizador;
+        SDL_Window* window;
         FuncionesPantalla* f;
         int opcionMenu;
 
@@ -28,7 +30,7 @@ class PantallaInicio
 
     public:
     ///Constructor
-        PantallaInicio(SDL_Surface * vent, FuncionesPantalla* f);
+        PantallaInicio(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* f);
         ~PantallaInicio();
 
     ///Funcion de la pantalla

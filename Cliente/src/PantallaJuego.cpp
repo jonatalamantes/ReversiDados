@@ -1,5 +1,5 @@
-#include <unistd.h>
-#include <sys/time.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <cerrno>
 #include <cstring>
@@ -11,14 +11,15 @@
 using namespace std;
 
 ///Constructor
-PantallaJuego::PantallaJuego(SDL_Surface* v, FuncionesPantalla* fp)
+PantallaJuego::PantallaJuego(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* fp)
 {
     srand(time(NULL));
 
     PantallaJuego::posibleX = -1;
     PantallaJuego::posibleY = -1;
 
-    PantallaJuego::ventana = v;
+    PantallaJuego::window = win;
+    PantallaJuego::renderizador = ren;
     PantallaJuego::f = fp;
 
     if (rand() % 2 == 0)
@@ -84,7 +85,7 @@ void PantallaJuego::inicializar()
 void PantallaJuego::animacionDado()
 {
     SDL_Rect rectangulo;
-    Uint32 color = SDL_MapRGB(PantallaJuego::ventana->format, 170,170,170); //blanco
+    SDL_Color color;
     short tamCuadro = 270;
 
     short dado1 = PantallaJuego::tablero.getDado(0);
@@ -101,10 +102,11 @@ void PantallaJuego::animacionDado()
     rectangulo.w = tamCuadro;
     rectangulo.h = tamCuadro;
 
-    SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+    SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
+    SDL_RenderFillRect(renderizador, &rectangulo);
 
     //Dibujamos un cuadrado blanco mas pequeño que el anterior en medio de la pantalla
-    color = SDL_MapRGB(PantallaJuego::ventana->format, 255,255,255); //blanco
+    SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255); //Blanco
     tamCuadro = 250;
 
     rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
@@ -112,70 +114,80 @@ void PantallaJuego::animacionDado()
     rectangulo.w = tamCuadro;
     rectangulo.h = tamCuadro;
 
-    SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
-
-    //Actualizamos el cuadro
-    SDL_UpdateRect(PantallaJuego::ventana, 0, 0, 0, 0);
+    SDL_RenderFillRect(renderizador, &rectangulo);
 
     //Establecemos las variables para el tiempo
-    struct timeval tv;
-    struct timezone tz;
-
-    int gtres = gettimeofday(&tv, &tz), i = 0;
-
-    double tiempo = ((double)tv.tv_sec * 1000000 + (double)tv.tv_usec);
+    double tiempo = SDL_GetTicks();
     double ptiempo = tiempo;
     bool terminar = false;
+    int i = 0;
 
     stringConvert fx;
+    SDL_Texture* tex;
 
-    while(!terminar)
+    SDL_Event e;
+
+    while(not terminar && not Fin)
     {
-        //Obtenemos la hora actual con los milisegundos
-        gtres = gettimeofday(&tv, &tz);
-
-        if (gtres < 0)
+        if (SDL_PollEvent(&e))
         {
-            //cerr<< "Error al llamar a gettimeofday: \"" <<  strerror(errno) << "\"" << endl;
-        }
-        else
-        {
-            //Transformamos a un número doble la hora
-            tiempo = ((double)tv.tv_sec * 1000000 + (double)tv.tv_usec);
-
-            //Imprimimos un punto si han pasado 75 milisegundos
-            if (tiempo - ptiempo > 75000)
+            if (e.type == SDL_QUIT)
             {
-                //Cargamos la imagen en relacion del numero del 1-5
-                string cad = "img/animacionDado";
-                cad = cad + fx.intToStr((i % 5) + 1) + ".bmp";
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        tablero.setFicha(i,j, colorJugador*(-1));
+                    }
+                }
 
-                rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
-                rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-                rectangulo.w = tamCuadro;
-                rectangulo.h = tamCuadro;
-
-                f->cargarImagen(PantallaJuego::ventana, cad.c_str(), rectangulo.x, rectangulo.y);
-
-                rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
-                rectangulo.y = ((TAM_CUADRO*12)/2)+125-(tamCuadro/2);
-                rectangulo.w = tamCuadro;
-                rectangulo.h = tamCuadro;
-
-                f->cargarImagen(PantallaJuego::ventana, cad.c_str(), rectangulo.x, rectangulo.y);
-
-                rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
-                rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-                rectangulo.w = tamCuadro;
-                rectangulo.h = tamCuadro;
-
-                f->cargarImagen(PantallaJuego::ventana, cad.c_str(), rectangulo.x, rectangulo.y);
-
-                SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
-
-                ptiempo = tiempo;
-                i++;
+                Fin = true;
+                dibujarTablero();
+                continue;
             }
+        }
+
+        //Transformamos a un número doble la hora
+        tiempo = SDL_GetTicks();
+
+        //Imprimimos un punto si han pasado 75 milisegundos
+        if (tiempo - ptiempo > 75)
+        {
+            //Cargamos la imagen en relacion del numero del 1-5
+            string cad = "img/animacionDado";
+            cad = cad + fx.intToStr((i % 5) + 1) + ".bmp";
+
+            tex = f->cargarTextura(cad, renderizador);
+
+            rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
+            rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+            rectangulo.w = tamCuadro/2;
+            rectangulo.h = tamCuadro/2;
+
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+                                 rectangulo.w, rectangulo.h);
+
+            rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
+            rectangulo.y = ((TAM_CUADRO*12)/2)+125-(tamCuadro/2);
+            rectangulo.w = tamCuadro/2;
+            rectangulo.h = tamCuadro/2;
+
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+                                 rectangulo.w, rectangulo.h);
+
+            rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
+            rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+            rectangulo.w = tamCuadro/2;
+            rectangulo.h = tamCuadro/2;
+
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+                                 rectangulo.w, rectangulo.h);
+
+            SDL_DestroyTexture(tex);
+            SDL_RenderPresent(renderizador);
+
+            ptiempo = tiempo;
+            i++;
         }
 
         if (i == 21)
@@ -184,38 +196,48 @@ void PantallaJuego::animacionDado()
         }
     }
 
-    //Cargamos el dado y ponemos el numero
-    rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
-    rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-    rectangulo.w = tamCuadro;
-    rectangulo.h = tamCuadro;
+    if (not Fin)
+    {
+        //Cargamos el dado y ponemos el numero
+        rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+        rectangulo.w = tamCuadro;
+        rectangulo.h = tamCuadro;
 
-    f->escribirPalabra(PantallaJuego::ventana, fx.intToStr(dado2).c_str(),
-                      rectangulo.x+56, rectangulo.y+45, "KeepCalm", 32, 224, 7, 43); //Rojo
+        color.r = 224;
+        color.g = 7;
+        color.b = 43;
 
-    rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
-    rectangulo.y = ((TAM_CUADRO*12)/2)+125-(tamCuadro/2);
-    rectangulo.w = tamCuadro;
-    rectangulo.h = tamCuadro;
+        tex = f->renderizarTexto(fx.intToStr(dado2).c_str(), "KeepCalm", color, 32, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x+56, rectangulo.y+45);
+        SDL_DestroyTexture(tex);
 
-    f->escribirPalabra(PantallaJuego::ventana, fx.intToStr(dado3).c_str(),
-                      rectangulo.x+56, rectangulo.y+45, "KeepCalm", 32, 224, 7, 43); //Rojo
+        rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)+125-(tamCuadro/2);
+        rectangulo.w = tamCuadro;
+        rectangulo.h = tamCuadro;
 
-    rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
-    rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-    rectangulo.w = tamCuadro;
-    rectangulo.h = tamCuadro;
+        tex = f->renderizarTexto(fx.intToStr(dado3).c_str(), "KeepCalm", color, 32, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x+56, rectangulo.y+45);
+        SDL_DestroyTexture(tex);
 
-    f->escribirPalabra(PantallaJuego::ventana, fx.intToStr(dado1).c_str(),
-                      rectangulo.x+56, rectangulo.y+45, "KeepCalm", 32, 224, 7, 43); //Rojo
+        rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+        rectangulo.w = tamCuadro;
+        rectangulo.h = tamCuadro;
 
-    SDL_UpdateRect(PantallaJuego::ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto(fx.intToStr(dado1).c_str(), "KeepCalm", color, 32, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x+56, rectangulo.y+45);
+        SDL_DestroyTexture(tex);
 
-    //Pausamos y agregamos el dado al tablero
-    sleep(1);
-    PantallaJuego::tablero.setDado(0, dado1);
-    PantallaJuego::tablero.setDado(1, dado2);
-    PantallaJuego::tablero.setDado(2, dado3);
+        SDL_RenderPresent(renderizador);
+
+        //Pausamos y agregamos el dado al tablero
+        SDL_Delay(1000);
+        PantallaJuego::tablero.setDado(0, dado1);
+        PantallaJuego::tablero.setDado(1, dado2);
+        PantallaJuego::tablero.setDado(2, dado3);
+    }
 }
 
 void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, short lastY)
@@ -228,7 +250,7 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
     {
         Fin = true;
         dibujarTablero();
-        sleep(1);
+        SDL_Delay(1000);
 
         if (cnn > cbn)
         {
@@ -264,7 +286,8 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
 
         //Dibujamos
         dibujarTablero();
-        sleep(1);
+
+        SDL_Delay(1000);
 
         //Establecemos el nuevo tablero
         PantallaJuego::tablero = nuevo;
@@ -283,7 +306,7 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
         }
 
         //Cargamos la ficha temporal
-        f->cargarFicha(PantallaJuego::ventana, posibleX, posibleY, 'G', "0");
+        f->cargarFicha(renderizador, posibleX, posibleY, 'G', "0");
 
         //Por cada ficha del tablero diferencte cargamos la animacion
         for (int i = 0; i < 8; i++)
@@ -294,16 +317,16 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
                 {
                     if (PantallaJuego::tablero.getFicha(i,j) != antiguo.getFicha(i,j))
                     {
-                        f->cargarFicha(PantallaJuego::ventana, i+1, j+1, fichaC, "1");
+                        f->cargarFicha(renderizador, i+1, j+1, fichaC, "1");
                     }
                 }
             }
         }
 
         //Actualizamos el tablero
-        SDL_UpdateRect(PantallaJuego::ventana, 0, 0, 0, 0);
+        SDL_RenderPresent(renderizador);
 
-        sleep(1);
+        SDL_Delay(1000);
     }
 }
 
@@ -315,20 +338,29 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
 void PantallaJuego::dibujarTablero()
 {
     int iniX, iniY, maxX, maxY;
-    SDL_Rect rectangulo;
     stringConvert strc;
-
-    Uint32 color = SDL_MapRGB(PantallaJuego::ventana->format, 0,0,0); //negro
+    int iW, iH;
+    SDL_Color color;
+    SDL_Texture* tex;
+    SDL_GetWindowSize(window, &iW, &iH);
+    SDL_Rect rectangulo;
 
     //Rellenamos de negro el tablero
-    SDL_FillRect(PantallaJuego::ventana, NULL, color);
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //negro
+    rectangulo.x = 0;
+    rectangulo.y = 0;
+    rectangulo.h = iH;
+    rectangulo.w = iW;
+
+    SDL_RenderFillRect(renderizador, &rectangulo);
 
     //Dibuja la parte cafe del tablero
     iniX = 0;
     iniY = 2;
     maxX = 9;
     maxY = 11;
-    color = SDL_MapRGB(PantallaJuego::ventana->format, 71, 29, 11); //cafe tablero
+
+    SDL_SetRenderDrawColor(renderizador, 71, 29, 11, 255); //Cafe
 
     for (int i = iniX; i < maxX; i++)
     {
@@ -339,7 +371,7 @@ void PantallaJuego::dibujarTablero()
             rectangulo.w = (TAM_CUADRO*maxX)-(TAM_CUADRO*i);
             rectangulo.h = (TAM_CUADRO*maxY)-(TAM_CUADRO*j);
 
-            SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+            SDL_RenderFillRect(renderizador, &rectangulo);
         }
     }
 
@@ -348,7 +380,7 @@ void PantallaJuego::dibujarTablero()
     iniY = 3;
     maxX = 9;
     maxY = 11;
-    color = SDL_MapRGB(PantallaJuego::ventana->format, 6, 112, 1); //verde tablero
+    SDL_SetRenderDrawColor(renderizador, 6, 112, 1, 255); //Cafe
 
     for (int i = iniX; i < maxX; i++)
     {
@@ -359,12 +391,12 @@ void PantallaJuego::dibujarTablero()
             rectangulo.w = (TAM_CUADRO*maxX)-(TAM_CUADRO*i);
             rectangulo.h = (TAM_CUADRO*maxY)-(TAM_CUADRO*j);
 
-            SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+            SDL_RenderFillRect(renderizador, &rectangulo);
         }
     }
 
     //Dibuja las lineas del tablero
-    color = SDL_MapRGB(PantallaJuego::ventana->format, 200, 200, 200); //gris
+    SDL_SetRenderDrawColor(renderizador, 200, 200, 200, 255); //Cafe
 
     for (int i = 0; i < TAM_CUADRO*9; i+=TAM_CUADRO)
     {
@@ -373,11 +405,11 @@ void PantallaJuego::dibujarTablero()
         rectangulo.w = TAM_LINEA;
         rectangulo.h = (TAM_CUADRO*12)-(TAM_CUADRO*3);
 
-        SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+        SDL_RenderFillRect(renderizador, &rectangulo);
     }
 
     rectangulo.x = TAM_CUADRO*9;
-    SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+    SDL_RenderFillRect(renderizador, &rectangulo);
 
     for (int i = TAM_CUADRO*2; i < TAM_CUADRO*12; i+=TAM_CUADRO)
     {
@@ -386,42 +418,54 @@ void PantallaJuego::dibujarTablero()
         rectangulo.w = (TAM_CUADRO*9)+TAM_LINEA;
         rectangulo.h = TAM_LINEA;
 
-        SDL_FillRect(PantallaJuego::ventana, &rectangulo, color);
+        SDL_RenderFillRect(renderizador, &rectangulo);
     }
 
     //Dibuja los números en el tablero
-    f->escribirPalabra(ventana, "1", 10+TAM_CUADRO*1, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "2", 10+TAM_CUADRO*2, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "3", 10+TAM_CUADRO*3, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "4", 10+TAM_CUADRO*4, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "5", 10+TAM_CUADRO*5, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "6", 10+TAM_CUADRO*6, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "7", 10+TAM_CUADRO*7, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
-    f->escribirPalabra(ventana, "8", 10+TAM_CUADRO*8, 7+TAM_CUADRO*2, "NinjaNaruto", 28);
+    color.r = 255;
+    color.g = 255;
+    color.b = 255;
 
-    f->escribirPalabra(PantallaJuego::ventana, "1", 10, 7+TAM_CUADRO*3, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "2", 10, 7+TAM_CUADRO*4, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "3", 10, 7+TAM_CUADRO*5, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "4", 10, 7+TAM_CUADRO*6, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "5", 10, 7+TAM_CUADRO*7, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "6", 10, 7+TAM_CUADRO*8, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "7", 10, 7+TAM_CUADRO*9, "NinjaNaruto", 28);
-    f->escribirPalabra(PantallaJuego::ventana, "8", 10, 7+TAM_CUADRO*10, "NinjaNaruto", 28);
+    stringConvert s;
+    for (int i = 1; i <= 8; i++)
+    {
+        tex = f->renderizarTexto(s.intToStr(i), "NinjaNaruto", color, 28, renderizador);
+        f->renderizarTextura(tex, renderizador, 10+TAM_CUADRO*i, 7+TAM_CUADRO*2);
+        f->renderizarTextura(tex, renderizador, 10, 7+TAM_CUADRO*(2+i));
+        SDL_DestroyTexture(tex);
+    }
 
     //Escribe nombre Jugadores
     if (PantallaJuego::turnoJugador == PantallaJuego::colorJugador)
     {
-        f->cargarImagen(PantallaJuego::ventana, "img/btnJugadorA.bmp", 5, 3);
-        f->cargarImagen(PantallaJuego::ventana, "img/btnJugadorB.bmp", 5, TAM_CUADRO+3);
+        tex = f->cargarTextura("img/btnJugadorA.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 5, 3);
+        SDL_DestroyTexture(tex);
+
+        tex = f->cargarTextura("img/btnJugadorB.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 5, TAM_CUADRO+3);
+        SDL_DestroyTexture(tex);
     }
     else
     {
-        f->cargarImagen(PantallaJuego::ventana, "img/btnJugadorB.bmp", 5, 3);
-        f->cargarImagen(PantallaJuego::ventana, "img/btnJugadorA.bmp", 5, TAM_CUADRO+3);
+        tex = f->cargarTextura("img/btnJugadorB.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 5, 3);
+        SDL_DestroyTexture(tex);
+
+        tex = f->cargarTextura("img/btnJugadorA.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 5, TAM_CUADRO+3);
+        SDL_DestroyTexture(tex);
     }
 
-    f->escribirPalabra(ventana, "Jugador A: " + nombreJugador1, 25, 0, "HelveticaStandar", 16);
-    f->escribirPalabra(ventana, "Jugador B: "+nombreJugador2,25,TAM_CUADRO, "HelveticaStandar", 16);
+    tex = f->renderizarTexto("Jugador A: " + nombreJugador1, "HelveticaStandar", 
+                             color, 16, renderizador);
+    f->renderizarTextura(tex, renderizador, 25, 0);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("Jugador B: " + nombreJugador2, "HelveticaStandar", 
+                             color, 16, renderizador);
+    f->renderizarTextura(tex, renderizador, 25, TAM_CUADRO);
+    SDL_DestroyTexture(tex);
 
     //Cargamos los tres octagonos
     short dado;
@@ -432,34 +476,50 @@ void PantallaJuego::dibujarTablero()
 
         if (dado == 0)
         {
-            f->cargarImagen(ventana, "img/octagonoVacio.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
+            tex = f->cargarTextura("img/octagonoVacio.bmp", renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
+            SDL_DestroyTexture(tex);
         }
         else
         {
-            f->cargarImagen(ventana, "img/octagonoLleno.bmp", TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
-            f->escribirPalabra(PantallaJuego::ventana, strc.intToStr(dado), TAM_CUADRO*(6+i)+4,
-                               TAM_CUADRO/2+13, "KeepCalm", 15);
+            tex = f->cargarTextura("img/octagonoLleno.bmp", renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
+            SDL_DestroyTexture(tex);
+
+            tex = f->renderizarTexto(strc.intToStr(dado), "KeepCalm", color, 15, renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*(6+i)+4, TAM_CUADRO/2+13);
+            SDL_DestroyTexture(tex);
         }
     }
 
     //Boton de abajo
     if (Fin)
     {
-        f->cargarImagen(PantallaJuego::ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-        f->escribirPalabra(PantallaJuego::ventana, "c e r r a r", TAM_CUADRO*6+27,
-                           TAM_CUADRO*11+15, "CrownTitle", 22);
+        tex = f->cargarTextura("img/btnOn.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("c e r r a r", "CrownTitle", color, 22, renderizador);
+        f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+27, TAM_CUADRO*11+15);
+        SDL_DestroyTexture(tex);
     }
     else
     {
-        if (dadosSet == false || turnoJugador != colorJugador)
+        if (not dadosSet && (turnoJugador == colorJugador))
         {
-            f->cargarImagen(ventana, "img/btnOn.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
-            f->escribirPalabra(ventana, "tirar dados", TAM_CUADRO*6+19, TAM_CUADRO*11+15,
-                               "CrownTitle", 22);
+            tex = f->cargarTextura("img/btnOn.bmp", renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+            SDL_DestroyTexture(tex);
+
+            tex = f->renderizarTexto("tirar dados", "CrownTitle", color, 22, renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+19, TAM_CUADRO*11+15);
+            SDL_DestroyTexture(tex);
         }
         else
         {
-            f->cargarImagen(ventana, "img/btnOff.bmp", TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+            tex = f->cargarTextura("img/btnOff.bmp", renderizador);
+            f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
+            SDL_DestroyTexture(tex);
         }
     }
 
@@ -500,7 +560,13 @@ void PantallaJuego::dibujarTablero()
         estadoJuego = "No tiene movimiento";
     }
 
-    f->escribirPalabra(ventana, estadoJuego, 15, TAM_CUADRO*11+15, "KeepCalm", 15, 255, 255, 0);
+    color.r = 255;
+    color.g = 255;
+    color.b = 0;
+
+    tex = f->renderizarTexto(estadoJuego, "KeepCalm", color, 15, renderizador);
+    f->renderizarTextura(tex, renderizador, 15, TAM_CUADRO*11+15);
+    SDL_DestroyTexture(tex);
 
     //Cargamos las fichas del tablero
     short int colorFicha;
@@ -513,11 +579,11 @@ void PantallaJuego::dibujarTablero()
 
             if (colorFicha < 0)
             {
-                f->cargarFicha(PantallaJuego::ventana, i+1, j+1, 'N', "0");
+                f->cargarFicha(renderizador, i+1, j+1, 'N', "0");
             }
             else if (colorFicha > 0)
             {
-                f->cargarFicha(PantallaJuego::ventana, i+1, j+1, 'B', "0");
+                f->cargarFicha(renderizador, i+1, j+1, 'B', "0");
             }
         }
     }
@@ -525,13 +591,13 @@ void PantallaJuego::dibujarTablero()
     //Revisamos que exista un movimiento posible, de ser así lo ponemos con una ficha gris
     if (posibleX != -1 && posibleY != -1)
     {
-        f->cargarFicha(PantallaJuego::ventana, posibleX, posibleY, 'G', "0");
+        f->cargarFicha(renderizador, posibleX, posibleY, 'G', "0");
     }
 
     //Actualizamos la superficie del tablero
-    SDL_UpdateRect(PantallaJuego::ventana, 0, 0, 0, 0);
+    SDL_RenderPresent(renderizador);
 
-    if (cnn + cbn == 64 || tablas)
+    if (Fin)
     {
         if (cnn == cbn)
         {
@@ -594,115 +660,147 @@ void PantallaJuego::dibujarReversiChan(int estado)
 {
     //Marco de la miniventana
     SDL_Rect rectangulo;
-    uint32_t color = SDL_MapRGB(ventana->format, 255, 255, 255); //Blanco
+    SDL_Color color;
+    SDL_SetRenderDrawColor(renderizador, 50, 50, 50, 255); //Blanco
 
     rectangulo.x = 90;
     rectangulo.y = 110;
     rectangulo.w = 170;
     rectangulo.h = 255;
 
-    SDL_FillRect(ventana, &rectangulo, color);
-
-    SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+    SDL_RenderFillRect(renderizador, &rectangulo);
 
     //Color interno de la miniventana
-    color = SDL_MapRGB(ventana->format, 255, 150, 0); //Naranja
+    SDL_SetRenderDrawColor(renderizador, 255, 150, 0, 255); //Naranja
 
     rectangulo.x = 100;
     rectangulo.y = 120;
     rectangulo.w = 150;
     rectangulo.h = 235;
 
-    SDL_FillRect(ventana, &rectangulo, color);
-    SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+    SDL_RenderFillRect(renderizador, &rectangulo);
+    SDL_Texture* tex;
 
-    SDL_FillRect(ventana, &rectangulo, color);
+    color.r = 255;
+    color.g = 255;
+    color.b = 255;
 
     if (estado == 1)
     {
-        f->cargarImagen(ventana, "img/ReversiChan1.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
-                           18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
-                           18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan1.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Buscando", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 25, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("Contrincante", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 5, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 2)
     {
-        f->cargarImagen(ventana, "img/ReversiChan2.png", rectangulo.x + 15, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
-                           18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
-                           18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan2.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 15, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Buscando", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 25, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("Contrincante", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 5, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 3)
     {
-        f->cargarImagen(ventana, "img/ReversiChan3.png", rectangulo.x, rectangulo.y);
-        f->escribirPalabra(ventana, "Buscando", rectangulo.x + 25, rectangulo.y + 190, "Arcarde",
-                           18, 255,255,255);
-        f->escribirPalabra(ventana, "Contrincante", rectangulo.x + 5, rectangulo.y + 210, "Arcarde",
-                           18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan3.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Buscando", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 25, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("Contrincante", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 5, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 4)
     {
-        //Imprimimos la imagen necesaria
-        f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x+10, rectangulo.y);
-        f->escribirPalabra(ventana, "Oponente", rectangulo.x + 35, rectangulo.y + 190, "Arcarde",
-                           16, 0,0,0);
-        f->escribirPalabra(ventana, "No Encontrado", rectangulo.x + 5, rectangulo.y + 210,
-                           "Arcarde", 16, 0,0,0);
+        tex = f->cargarTextura("img/ReversiChan4.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Oponente", "Arcarde", color, 16, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 35, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("No Encontrado", "Arcarde", color, 16, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 5, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 5)
     {
-        f->cargarImagen(ventana, "img/ReversiChan5.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190, "Arcarde",
-                           18, 255,255,255);
-        f->escribirPalabra(ventana, "Negro", rectangulo.x + 45, rectangulo.y + 210, "Arcarde",
-                           18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan5.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Su Color", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 35, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("Negro", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 45, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 6)
     {
-        f->cargarImagen(ventana, "img/ReversiChan6.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Su Color", rectangulo.x + 35, rectangulo.y + 190,
-                          "Arcarde", 18, 255,255,255);
-        f->escribirPalabra(ventana, "Blanco", rectangulo.x + 40, rectangulo.y + 210,
-                          "Arcarde", 18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan6.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Su Color", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 35, rectangulo.y + 190);
+        SDL_DestroyTexture(tex);
+
+        tex = f->renderizarTexto("Blanco", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 45, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 7)
     {
-        f->cargarImagen(ventana, "img/ReversiChan7.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Ganador", rectangulo.x + 35, rectangulo.y + 210,
-                           "Arcarde", 18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan7.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Ganador", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 35, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 8)
     {
-        f->cargarImagen(ventana, "img/ReversiChan8.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Perdedor", rectangulo.x + 30, rectangulo.y + 210,
-                           "Arcarde", 18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan8.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Perdedor", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 35, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
     else if (estado == 9)
     {
-        f->cargarImagen(ventana, "img/ReversiChan4.png", rectangulo.x + 10, rectangulo.y);
-        f->escribirPalabra(ventana, "Empate", rectangulo.x + 40, rectangulo.y + 210,
-                          "Arcarde", 18, 255,255,255);
+        tex = f->cargarTextura("img/ReversiChan4.png", renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 10, rectangulo.y);
+        SDL_DestroyTexture(tex);
 
-        SDL_UpdateRect(ventana, rectangulo.x, rectangulo.y, rectangulo.w, rectangulo.h);
+        tex = f->renderizarTexto("Empate", "Arcarde", color, 18, renderizador);
+        f->renderizarTextura(tex, renderizador, rectangulo.x + 45, rectangulo.y + 210);
+        SDL_DestroyTexture(tex);
     }
+
+    SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -733,59 +831,55 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
         revisar.events = POLLIN;
 
         //Establecemos las variables para el tiempo
-        struct timeval tv;
-        struct timezone tz;
+        int n, res;
 
-        int gtres = gettimeofday(&tv, &tz), n, res;
-
-        double tiempo = ((double)tv.tv_sec * 1000000 + (double)tv.tv_usec);
+        double tiempo = SDL_GetTicks();
         double ptiempo = tiempo;
 
         int contador = 0;
         bool animar = true, iniciaJuego = false;
 
+        SDL_Event e;
+
         //Iteramos hasta que se termine el tiempo o nos reciba el servidor
         while (animar)
         {
-            //Obtenemos la hora actual con los milisegundos
-            gtres = gettimeofday(&tv, &tz);
+            SDL_PollEvent(&e);
 
-            if (gtres < 0)
+            if (e.type == SDL_QUIT)
             {
-                //cerr<< "Error al llamar a gettimeofday: \"" <<  strerror(errno) << "\"" << endl;
+                break;
             }
-            else
+
+            //Transformamos a un número doble la hora
+            tiempo = SDL_GetTicks();
+
+            //Imprimimos un punto si han pasado 500 milisegundos
+            if (tiempo - ptiempo > 500)
             {
-                //Transformamos a un número doble la hora
-                tiempo = ((double)tv.tv_sec * 1000000 + (double)tv.tv_usec);
-
-                //Imprimimos un punto si han pasado 400 milisegundos
-                if (tiempo - ptiempo > 500000)
+                if (animar)
                 {
-                    if (animar)
+                    //Imprimimos la imagen necesaria
+                    if (contador % 4 == 0)
                     {
-                        //Imprimimos la imagen necesaria
-                        if (contador % 4 == 0)
-                        {
-                            dibujarReversiChan(1);
-                        }
-                        else if (contador % 4 == 1 || contador % 4 == 3)
-                        {
-                            dibujarReversiChan(2);
-                        }
-                        else
-                        {
-                            dibujarReversiChan(3);
-                        }
+                        dibujarReversiChan(1);
+                    }
+                    else if (contador % 4 == 1 || contador % 4 == 3)
+                    {
+                        dibujarReversiChan(2);
+                    }
+                    else
+                    {
+                        dibujarReversiChan(3);
+                    }
 
-                        ptiempo = tiempo;
-                        contador++;
+                    ptiempo = tiempo;
+                    contador++;
 
-                        //15 Segundos de confirmacion
-                        if (contador == 30)
-                        {
-                            animar = false;
-                        }
+                    //15 Segundos de confirmacion
+                    if (contador == 30)
+                    {
+                        animar = false;
                     }
                 }
             }
@@ -895,7 +989,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
             close(cl->getSock());
 
             dibujarReversiChan(4);
-            sleep(3);
+            SDL_Delay(3000);
         }
     }
     else
@@ -930,12 +1024,12 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
     if (colorJugador != 1)
     {
         dibujarReversiChan(5);
-        sleep(3);
+        SDL_Delay(3000);
     }
     else
     {
         dibujarReversiChan(6);
-        sleep(3);
+        SDL_Delay(3000);
     }
 
     do
@@ -1106,7 +1200,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                         }
 
                         dibujarTablero();
-                        sleep(3);
+                        SDL_Delay(3000);
                     }
                 }
             }
@@ -1117,7 +1211,10 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
             //Cambiamos al turno del jugador
             PantallaJuego::turnoJugador = PantallaJuego::colorJugador;
 
-            SDL_PollEvent(&Evento);
+            if (not SDL_PollEvent(&Evento))
+            {
+                continue;
+            }
 
             //Indicamos que tiene que dar click en el boton de abajo o salir
             if (Evento.type == SDL_MOUSEBUTTONDOWN)
@@ -1139,7 +1236,11 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
         else //Hay juego activo
         {
             PantallaJuego::dibujarTablero();
-            SDL_PollEvent(&Evento);
+
+            if (not SDL_PollEvent(&Evento))
+            {
+                continue;
+            }
 
             if (PantallaJuego::turnoJugador == PantallaJuego::colorJugador)
             {
@@ -1257,12 +1358,12 @@ void PantallaJuego::gestionarEventos()
     if (colorJugador != 1)
     {
         dibujarReversiChan(5);
-        sleep(3);
+        SDL_Delay(3000);
     }
     else
     {
         dibujarReversiChan(6);
-        sleep(3);
+        SDL_Delay(3000);
     }
 
     while (!endgame)
@@ -1272,7 +1373,7 @@ void PantallaJuego::gestionarEventos()
 
         if (Fin) //Si hay fin de juego
         {
-            sleep(3);
+            SDL_Delay(3000);
             endgame = true;
         }
         else //Hay juego activo
@@ -1296,7 +1397,7 @@ void PantallaJuego::gestionarEventos()
                     noTurno = true;
                     PantallaJuego::tablero.inicializarDados();
                     dibujarTablero();
-                    sleep(2);
+                    SDL_Delay(2000);
 
                     PantallaJuego::turnoJugador = (-1) * PantallaJuego::turnoJugador;
                     dadosSet = false;
@@ -1344,7 +1445,7 @@ void PantallaJuego::gestionarEventos()
                     {
                         if (PantallaJuego::tablero.validarMovimiento(x, y, colorJugador * (-1)))
                         {
-                            sleep(1);
+                            SDL_Delay(1000);
 
                             //Cargamos el movimiento de la computadora
                             PantallaJuego::tablero.colocarFicha(x, y, colorJugador * (-1));
@@ -1361,7 +1462,10 @@ void PantallaJuego::gestionarEventos()
             }
             else if (turnoRevisado)//Turno del usuario
             {
-                SDL_WaitEvent(&Evento);
+                if (not SDL_PollEvent(&Evento))
+                {
+                    continue;
+                }
 
                 if (Evento.type == SDL_MOUSEMOTION)
                 {
@@ -1469,7 +1573,7 @@ void PantallaJuego::gestionarEventos()
                     }
 
                     dibujarTablero();
-                    sleep(3);
+                    SDL_Delay(3000);
 
                     endgame = true;
                 }

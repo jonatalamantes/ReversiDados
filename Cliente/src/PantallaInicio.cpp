@@ -1,6 +1,5 @@
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <unistd.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include "FuncionesPantalla.h"
 #include "PantallaInicio.h"
@@ -9,17 +8,20 @@
 using namespace std;
 
 ///Constructor
-PantallaInicio::PantallaInicio(SDL_Surface* vent, FuncionesPantalla* fe)
+PantallaInicio::PantallaInicio(SDL_Window* win, SDL_Renderer* ren, FuncionesPantalla* fe)
 {
     PantallaInicio::opcionMenu = 1;
-    PantallaInicio::ventana = vent;
+    PantallaInicio::window = win;
+    PantallaInicio::renderizador = ren;
     PantallaInicio::f = fe;
 }
 
 ///Destructor
 PantallaInicio::~PantallaInicio()
 {
-    PantallaInicio::ventana = NULL;
+    PantallaInicio::window = NULL;
+    PantallaInicio::renderizador = NULL;
+    PantallaInicio::f = NULL;
 }
 
 /**
@@ -29,37 +31,78 @@ PantallaInicio::~PantallaInicio()
  */
 void PantallaInicio::imprimirPantallaInterna()
 {
-    Uint32 color = SDL_MapRGB(PantallaInicio::ventana->format, 0,0,0); //negro
+    int iW, iH;
+    SDL_Color color;
+    SDL_Texture* tex;
+    SDL_GetWindowSize(window, &iW, &iH);
+    SDL_Rect r;
 
     //Rellenamos de negro el tablero
-    SDL_FillRect(PantallaInicio::ventana, NULL, color);
+    SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //negro
+    r.x = 0;
+    r.y = 0;
+    r.h = iH;
+    r.w = iW;
 
-    f->escribirPalabra(PantallaInicio::ventana, "Reversi", 5, 48, "Blazed", 43, 255, 0, 0);
-    f->cargarImagen(PantallaInicio::ventana, "img/logo.bmp", TAM_CUADRO*6, TAM_CUADRO/2);
+    SDL_RenderFillRect(renderizador, &r);
 
-    f->escribirPalabra(ventana, "VS Computadora", 75, 170, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(ventana, "VS Jugador 2", 110, 250, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(ventana, "Opciones", 135, 330, "Arcarde", 30, 255, 255, 0);
-    f->escribirPalabra(ventana, "Salir", 150, 400, "Arcarde", 30, 255, 255, 0);
+    //Cargamos las palabras
+    color.r = 255;
+    color.g = 0;
+    color.b = 0;
+    tex = f->renderizarTexto("Reversi", "Blazed", color, 43, renderizador);
+    f->renderizarTextura(tex, renderizador, 5, 48);
+    SDL_DestroyTexture(tex);
+
+    tex = f->cargarTextura("img/logo.bmp", renderizador);
+    f->renderizarTextura(tex, renderizador, TAM_CUADRO*6, TAM_CUADRO/2);
+    SDL_DestroyTexture(tex);
+
+    color.r = 255;
+    color.g = 255;
+    color.b = 0;
+    tex = f->renderizarTexto("VS Computadora", "Arcarde", color, 30, renderizador);
+    f->renderizarTextura(tex, renderizador, 75, 165);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("VS Jugador 2", "Arcarde", color, 30, renderizador);
+    f->renderizarTextura(tex, renderizador, 110, 245);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("Opciones", "Arcarde", color, 30, renderizador);
+    f->renderizarTextura(tex, renderizador, 135, 325);
+    SDL_DestroyTexture(tex);
+
+    tex = f->renderizarTexto("Salir", "Arcarde", color, 30, renderizador);
+    f->renderizarTextura(tex, renderizador, 150, 405);
+    SDL_DestroyTexture(tex);
 
     if (PantallaInicio::opcionMenu == 1)
     {
-        f->cargarImagen(PantallaInicio::ventana, "img/fichaInicial.bmp", 10, 165);
+        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 10, 160);
+        SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 2)
     {
-        f->cargarImagen(PantallaInicio::ventana, "img/fichaInicial.bmp", 10, 245);
+        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 10, 240);
+        SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 3)
     {
-        f->cargarImagen(PantallaInicio::ventana, "img/fichaInicial.bmp", 10, 325);
+        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 10, 320);
+        SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 4)
     {
-        f->cargarImagen(PantallaInicio::ventana, "img/fichaInicial.bmp", 10, 390);
+        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        f->renderizarTextura(tex, renderizador, 10, 400);
+        SDL_DestroyTexture(tex);
     }
 
-    SDL_UpdateRect(PantallaInicio::ventana, 0, 0, 0, 0);
+    SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -76,7 +119,10 @@ int PantallaInicio::imprimirPantalla()
     {
         PantallaInicio::imprimirPantallaInterna();
 
-        SDL_WaitEvent(&Evento1);
+        if (not SDL_PollEvent(&Evento1))
+        {
+            continue;
+        }
 
         if (Evento1.type == SDL_MOUSEBUTTONDOWN)
         {
@@ -126,11 +172,12 @@ int PantallaInicio::imprimirPantalla()
         }
         else if (Evento1.type == SDL_KEYDOWN)
         {
-            if (Evento1.key.keysym.sym == 13) //Enter
+            if (Evento1.key.keysym.sym == SDLK_RETURN ||
+                Evento1.key.keysym.sym == SDLK_KP_ENTER) //Enter
             {
                 Fin = true;
             }
-            else if (Evento1.key.keysym.sym == 273) //Boton Arriba
+            else if (Evento1.key.keysym.sym == SDLK_UP) //Boton Arriba
             {
                 if (PantallaInicio::opcionMenu == 2)
                 {
@@ -145,7 +192,7 @@ int PantallaInicio::imprimirPantalla()
                     PantallaInicio::opcionMenu = 3;
                 }
             }
-            else if (Evento1.key.keysym.sym == 274) //Boton Abajo
+            else if (Evento1.key.keysym.sym == SDLK_DOWN) //Boton Abajo
             {
                 if (PantallaInicio::opcionMenu == 1)
                 {

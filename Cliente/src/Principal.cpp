@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <unistd.h>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include "Constantes.h"
 #include "FuncionesPantalla.h"
 #include "PantallaConfiguracion.h"
@@ -30,45 +30,58 @@ Principal::Principal()
  */
 void Principal::jugar()
 {
-    SDL_Surface* Pantalla;
+        //The window we'll be rendering to
+    SDL_Window* window = NULL;
     FuncionesPantalla* f = new FuncionesPantalla();
 
-    //Inicializar SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    //The surface contained by the window
+    if (SDL_Init( SDL_INIT_VIDEO ) < 0)
     {
-        //cout << "Unable to init SDL: " << SDL_GetError() << endl;
+        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
         exit(1);
     }
 
+
     if (TTF_Init() != 0)
     {
-    	//cout<< "Error letras " << TTF_GetError() << endl;
-    	SDL_Quit();
-    	exit(1);
+        printf( "SDL could not initialize! SDL_TTF: %s\n", SDL_GetError() );
+        SDL_Quit();
+        exit(1);
     }
 
-    //Creamos la pantalla
-    Pantalla = SDL_SetVideoMode(TAM_CUADRO*9+TAM_LINEA, TAM_CUADRO*12+TAM_LINEA, 32, SDL_SWSURFACE);
+    //Create window
+    window = SDL_CreateWindow("Reversi",
+                               SDL_WINDOWPOS_UNDEFINED,
+                               SDL_WINDOWPOS_UNDEFINED,
+                               TAM_CUADRO*9+TAM_LINEA,
+                               TAM_CUADRO*12+TAM_LINEA,
+                               SDL_WINDOW_SHOWN);
 
-    if (Pantalla == NULL)
+    if(window == NULL)
     {
-       //cout << "Unable to set 720x540 video: " << SDL_GetError() << endl;
-       exit(1);
+        printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+        exit(1);
     }
 
-    if (SDL_MUSTLOCK(Pantalla))
+    SDL_Surface* icono = IMG_Load((f->getPath() + "img/ReversiChan7.png").c_str());
+    SDL_SetWindowIcon(window, icono);
+
+    SDL_Renderer *ren = SDL_CreateRenderer(window, -1, 
+                                           SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    if (ren == NULL)
     {
-        SDL_LockSurface(Pantalla);
+        SDL_DestroyWindow(window);
+        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        exit(-1);
     }
 
-    pi = new PantallaInicio(Pantalla, f);
-    pc = new PantallaConfiguracion(Pantalla, f);
-    pj = new PantallaJuego(Pantalla, f);
+    pi = new PantallaInicio(window, ren, f);
+    pc = new PantallaConfiguracion(window, ren, f);
+    pj = new PantallaJuego(window, ren, f);
 
     int op;
-
-    //Establecemos el titulo
-    SDL_WM_SetCaption("Reversi", NULL);
 
     do
     {
@@ -98,5 +111,7 @@ void Principal::jugar()
     delete f;
 
 	TTF_Quit();
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(window);
     SDL_Quit();
 }
