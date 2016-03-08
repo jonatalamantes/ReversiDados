@@ -32,7 +32,7 @@ void Principal::jugar()
 {
         //The window we'll be rendering to
     SDL_Window* window = NULL;
-    FuncionesPantalla* f = new FuncionesPantalla();
+    FuncionesPantalla* f = NULL;
 
     //The surface contained by the window
     if (SDL_Init( SDL_INIT_VIDEO ) < 0)
@@ -55,7 +55,7 @@ void Principal::jugar()
                                SDL_WINDOWPOS_UNDEFINED,
                                TAM_CUADRO*9+TAM_LINEA,
                                TAM_CUADRO*12+TAM_LINEA,
-                               SDL_WINDOW_SHOWN);
+                               SDL_WINDOW_RESIZABLE);
 
     if(window == NULL)
     {
@@ -63,10 +63,12 @@ void Principal::jugar()
         exit(1);
     }
 
+    f = new FuncionesPantalla(window);
+
     SDL_Surface* icono = IMG_Load((f->getPath() + "img/ReversiChan7.png").c_str());
     SDL_SetWindowIcon(window, icono);
 
-    SDL_Renderer *ren = SDL_CreateRenderer(window, -1, 
+    SDL_Renderer *ren = SDL_CreateRenderer(window, -1,
                                            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if (ren == NULL)

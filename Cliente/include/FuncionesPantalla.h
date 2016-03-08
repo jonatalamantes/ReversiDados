@@ -21,16 +21,17 @@ class FuncionesPantalla
     ///Atributos
         List<Fuente> fuentes;
         string path;
+        SDL_Window* window;
 
     public:
     ///Constructor
-        FuncionesPantalla();
+        FuncionesPantalla(SDL_Window* win);
 
     ///Getters
         string getPath();
 
     ///Funciones útiles para SDL
-    
+
     	/**
     	 * Carga una textura a partir de un archivo de imagen
     	 *
@@ -52,7 +53,7 @@ class FuncionesPantalla
          * @param  renderer Renderizador
          * @return          Textura creada o NULL
          */
-        SDL_Texture* renderizarTexto(string message, string fontFile, SDL_Color color, int fontSize, 
+        SDL_Texture* renderizarTexto(string message, string fontFile, SDL_Color color, int fontSize,
         						     SDL_Renderer *renderer);
 
         /**
@@ -78,7 +79,7 @@ class FuncionesPantalla
          * @param  y   Posicion Y del objetivo
          */
         void renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren, int x, int y);
-        
+
         /**
          * Carga la imagen de una ficha segun el estado
          *
@@ -90,6 +91,16 @@ class FuncionesPantalla
          * @param estado   Estado de la ficha
          */
         void cargarFicha(SDL_Renderer* ren, int fila, int columna, char tipo, string estado);
+
+        /**
+         * Calcula la proporcion de un objeto en relación del tamaño de la pantalla
+         *
+         * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+         * @param antes   Numero a transformar en la proporcion
+         * @param pos     'H' o 'h' es para horizontal, sino es en vertical
+         * @return        Numero con la proporción resultante
+         */
+        float calcularProporcion(float antes, char posicion);
 };
 
 #endif // FUNCIONESPANTALLA_H

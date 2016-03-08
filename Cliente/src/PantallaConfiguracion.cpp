@@ -121,15 +121,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     SDL_DestroyTexture(tex);
 
     //Area del cuadro de texto NJ
-    areae.x = 20;
-    areae.y = 195;
-    areae.w = 325;
-    areae.h = 40;
+    areae.x = f->calcularProporcion(20, 'w');
+    areae.y = f->calcularProporcion(195, 'h');
+    areae.w = f->calcularProporcion(325, 'w');
+    areae.h = f->calcularProporcion(40, 'h');
 
-    areai.x = 25;
-    areai.y = 200;
-    areai.w = 315;
-    areai.h = 30;
+    areai.x = f->calcularProporcion(25, 'w');
+    areai.y = f->calcularProporcion(200, 'h');
+    areai.w = f->calcularProporcion(315, 'w');
+    areai.h = f->calcularProporcion(30, 'h');
 
     if (PantallaConfiguracion::opcionMenu == 1)
     {
@@ -163,15 +163,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     }
 
     //Area del cuadro de texto HC
-    areae.x = 20;
-    areae.y = 275;
-    areae.w = 325;
-    areae.h = 40;
+    areae.x = f->calcularProporcion(20, 'w');
+    areae.y = f->calcularProporcion(275, 'h');
+    areae.w = f->calcularProporcion(325, 'w');
+    areae.h = f->calcularProporcion(40, 'h');
 
-    areai.x = 25;
-    areai.y = 280;
-    areai.w = 315;
-    areai.h = 30;
+    areai.x = f->calcularProporcion(25, 'w');
+    areai.y = f->calcularProporcion(280, 'h');
+    areai.w = f->calcularProporcion(315, 'w');
+    areai.h = f->calcularProporcion(30, 'h');
 
     if (PantallaConfiguracion::opcionMenu == 2)
     {
@@ -205,15 +205,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     }
 
     //Area del cuadro de texto Puerto
-    areae.x = 20;
-    areae.y = 355;
-    areae.w = 325;
-    areae.h = 40;
+    areae.x = f->calcularProporcion(20, 'w');
+    areae.y = f->calcularProporcion(355, 'h');
+    areae.w = f->calcularProporcion(325, 'w');
+    areae.h = f->calcularProporcion(40, 'h');
 
-    areai.x = 25;
-    areai.y = 360;
-    areai.w = 315;
-    areai.h = 30;
+    areai.x = f->calcularProporcion(25, 'w');
+    areai.y = f->calcularProporcion(360, 'h');
+    areai.w = f->calcularProporcion(315, 'w');
+    areai.h = f->calcularProporcion(30, 'h');
 
     if (PantallaConfiguracion::opcionMenu == 3)
     {
@@ -247,15 +247,15 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     }
 
     //Area del Boton de Salir
-    areae.x = 100;
-    areae.y = 420;
-    areae.w = 170;
-    areae.h = 40;
+    areae.x = f->calcularProporcion(100, 'w');
+    areae.y = f->calcularProporcion(420, 'h');
+    areae.w = f->calcularProporcion(170, 'w');
+    areae.h = f->calcularProporcion(40, 'h');
 
-    areai.x = 105;
-    areai.y = 425;
-    areai.w = 160;
-    areai.h = 30;
+    areai.x = f->calcularProporcion(105, 'w');
+    areai.y = f->calcularProporcion(425, 'h');
+    areai.w = f->calcularProporcion(160, 'w');
+    areai.h = f->calcularProporcion(30, 'h');
 
     if (PantallaConfiguracion::opcionMenu == 4)
     {
@@ -278,7 +278,7 @@ void PantallaConfiguracion::imprimirPantallaInterna()
     color.g = 255;
     color.b = 255;
     tex = f->renderizarTexto("Guardar", "Arcarde", color, 20, renderizador);
-    f->renderizarTextura(tex, renderizador, areai.x + 35, areai.y + 2);
+    f->renderizarTextura(tex, renderizador, 140, 427);
     SDL_DestroyTexture(tex);
 
     //Actualizamos la pantalla
@@ -310,19 +310,19 @@ void PantallaConfiguracion::imprimirPantalla()
         {
             int y = Evento.button.y;
 
-            if (y > 180 && y < 260)
+            if (y > f->calcularProporcion(180, 'h') && y < f->calcularProporcion(260, 'h'))
             {
                 PantallaConfiguracion::opcionMenu = 1;
             }
-            else if (y > 260 && y < 340)
+            else if (y > f->calcularProporcion(260, 'h') && y < f->calcularProporcion(340, 'h'))
             {
                 PantallaConfiguracion::opcionMenu = 2;
             }
-            else if (y > 340 && y < 405)
+            else if (y > f->calcularProporcion(340, 'h') && y < f->calcularProporcion(405, 'h'))
             {
                 PantallaConfiguracion::opcionMenu = 3;
             }
-            else if (y > 405)
+            else if (y > f->calcularProporcion(405, 'h'))
             {
                 PantallaConfiguracion::opcionMenu = 4;
                 Fin = true;

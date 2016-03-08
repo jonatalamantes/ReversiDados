@@ -12,8 +12,10 @@
 using namespace std;
 
 ///Constructor
-FuncionesPantalla::FuncionesPantalla()
+FuncionesPantalla::FuncionesPantalla(SDL_Window* win)
 {
+    FuncionesPantalla::window = win;
+
     ifstream archivo("pathFile.dat");
 
     if (archivo)
@@ -66,15 +68,15 @@ SDL_Texture* FuncionesPantalla::cargarTextura(string file, SDL_Renderer *ren)
  * @param  w   Tamaño del largo de la textura
  * @param  h   Tamaño del alto de la textura
  */
-void FuncionesPantalla::renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren, 
+void FuncionesPantalla::renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren,
                                           int x, int y, int w, int h)
 {
 	//Setup the destination rectangle to be at the position we want
 	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
-	dst.w = w;
-	dst.h = h;
+	dst.x = FuncionesPantalla::calcularProporcion(x, 'w');
+	dst.y = FuncionesPantalla::calcularProporcion(y, 'h');
+	dst.w = FuncionesPantalla::calcularProporcion(w, 'w');
+	dst.h = FuncionesPantalla::calcularProporcion(h, 'h');
 	SDL_RenderCopy(ren, tex, NULL, &dst);
 }
 
@@ -105,7 +107,7 @@ void FuncionesPantalla::renderizarTextura(SDL_Texture *tex, SDL_Renderer *ren, i
  * @param  renderer Renderizador
  * @return          Textura creada o NULL
  */
-SDL_Texture* FuncionesPantalla::renderizarTexto(string message, string fontFile, SDL_Color color, 
+SDL_Texture* FuncionesPantalla::renderizarTexto(string message, string fontFile, SDL_Color color,
                                                 int fontSize, SDL_Renderer *renderer)
 {
     if (message != "")
@@ -121,7 +123,7 @@ SDL_Texture* FuncionesPantalla::renderizarTexto(string message, string fontFile,
         if (pos == -1)
         {
             //La insertamos de no estar en la lista
-            string nFuente = FuncionesPantalla::path + "fonts/" + fontFile + ".ttf";
+            string nFuente = FuncionesPantalla::path + "fonts/" + fontFile + ".png";
             aux.setPuntero(TTF_OpenFont(nFuente.c_str(), fontSize));
 
             if (aux.getPuntero() == NULL)
@@ -180,35 +182,35 @@ SDL_Texture* FuncionesPantalla::renderizarTexto(string message, string fontFile,
  * @param tipo     'B' para Blanco o 'N' para negro
  * @param estado   Estado de la ficha
  */
-void FuncionesPantalla::cargarFicha(SDL_Renderer* ren, int fila, int columna, 
+void FuncionesPantalla::cargarFicha(SDL_Renderer* ren, int fila, int columna,
                                     char tipo, string estado)
 {
     SDL_Texture* ficha = NULL;
 
     if (tipo == 'N' || tipo == 'n')
     {
-        string fichaString = FuncionesPantalla::path + "img/negra";
+        string fichaString = "img/negra";
         fichaString.append(estado);
-        fichaString.append(".bmp");
+        fichaString.append(".png");
 
         ficha = FuncionesPantalla::cargarTextura(fichaString, ren);
     }
     else if (tipo == 'B' || tipo == 'b')
     {
-        string fichaString = FuncionesPantalla::path + "img/blanca";
+        string fichaString = "img/blanca";
         fichaString.append(estado);
-        fichaString.append(".bmp");
+        fichaString.append(".png");
 
         ficha = FuncionesPantalla::cargarTextura(fichaString, ren);
     }
     else if (tipo == 'G' || tipo == 'g')
     {
-        string fichaString = FuncionesPantalla::path + "img/gris.bmp";
+        string fichaString = "img/gris.png";
         ficha = FuncionesPantalla::cargarTextura(fichaString, ren);
     }
 
     if (ficha != NULL)
-    {   
+    {
         SDL_Rect rectangulo;
         rectangulo.x = (TAM_CUADRO*(fila)) + TAM_LINEA + 2;
         rectangulo.y = (TAM_CUADRO*(2 + columna)) + TAM_LINEA + 3;
@@ -216,4 +218,33 @@ void FuncionesPantalla::cargarFicha(SDL_Renderer* ren, int fila, int columna,
         FuncionesPantalla::renderizarTextura(ficha, ren, rectangulo.x, rectangulo.y);
         SDL_DestroyTexture(ficha);
     }
+}
+
+/**
+ * Calcula la proporcion de un objeto en relación del tamaño de la pantalla
+ *
+ * @author Jonathan Sandoval <jonathan_s_pisis@yahoo.com.mx>
+ * @param antes   Numero a transformar en la proporcion
+ * @param pos     'H' o 'h' es para horizontal, sino es en vertical
+ * @return        Numero con la proporción resultante
+ */
+float FuncionesPantalla::calcularProporcion(float antes, char posicion)
+{
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+
+    float nativeW = TAM_CUADRO*9+TAM_LINEA;
+    float nativeH = TAM_CUADRO*12+TAM_LINEA;
+    float res = 0;
+
+    if (posicion == 'H' || posicion == 'h')
+    {
+        res = antes * (100*h/nativeH) / 100;
+    }
+    else
+    {
+        res = antes * (100*w/nativeW) / 100;
+    }
+
+    return res;
 }

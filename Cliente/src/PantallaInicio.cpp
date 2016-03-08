@@ -54,7 +54,7 @@ void PantallaInicio::imprimirPantallaInterna()
     f->renderizarTextura(tex, renderizador, 5, 48);
     SDL_DestroyTexture(tex);
 
-    tex = f->cargarTextura("img/logo.bmp", renderizador);
+    tex = f->cargarTextura("img/logo.png", renderizador);
     f->renderizarTextura(tex, renderizador, TAM_CUADRO*6, TAM_CUADRO/2);
     SDL_DestroyTexture(tex);
 
@@ -79,25 +79,25 @@ void PantallaInicio::imprimirPantallaInterna()
 
     if (PantallaInicio::opcionMenu == 1)
     {
-        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        tex = f->cargarTextura("img/fichaInicial.png", renderizador);
         f->renderizarTextura(tex, renderizador, 10, 160);
         SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 2)
     {
-        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        tex = f->cargarTextura("img/fichaInicial.png", renderizador);
         f->renderizarTextura(tex, renderizador, 10, 240);
         SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 3)
     {
-        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        tex = f->cargarTextura("img/fichaInicial.png", renderizador);
         f->renderizarTextura(tex, renderizador, 10, 320);
         SDL_DestroyTexture(tex);
     }
     else if (PantallaInicio::opcionMenu == 4)
     {
-        tex = f->cargarTextura("img/fichaInicial.bmp", renderizador);
+        tex = f->cargarTextura("img/fichaInicial.png", renderizador);
         f->renderizarTextura(tex, renderizador, 10, 400);
         SDL_DestroyTexture(tex);
     }
@@ -128,22 +128,26 @@ int PantallaInicio::imprimirPantalla()
         {
             int y = Evento1.motion.y;
 
-            if (PantallaInicio::opcionMenu == 1 || (y > 170 && y < 220))
+            if (PantallaInicio::opcionMenu == 1 ||
+                ( y > f->calcularProporcion(170, 'h') && y < f->calcularProporcion(220, 'h')) )
             {
                 PantallaInicio::opcionMenu = 1;
                 Fin = true;
             }
-            else if (PantallaInicio::opcionMenu == 2 || (y > 250 && y < 300))
+            else if (PantallaInicio::opcionMenu == 2 ||
+                    ( y > f->calcularProporcion(250, 'h') && y < f->calcularProporcion(300, 'h')) )
             {
                 PantallaInicio::opcionMenu = 2;
                 Fin = true;
             }
-            else if (PantallaInicio::opcionMenu == 3 || (y > 320 && y < 370))
+            else if (PantallaInicio::opcionMenu == 3 ||
+                    ( y > f->calcularProporcion(320, 'h') && y < f->calcularProporcion(370, 'h')) )
             {
                 PantallaInicio::opcionMenu = 3;
                 Fin = true;
             }
-            else if (PantallaInicio::opcionMenu == 4 || (y > 370 && y < 450))
+            else if (PantallaInicio::opcionMenu == 4 ||
+                    ( y > f->calcularProporcion(370, 'h') && y < f->calcularProporcion(450, 'h')) )
             {
                 PantallaInicio::opcionMenu = 4;
                 Fin = true;
@@ -153,19 +157,19 @@ int PantallaInicio::imprimirPantalla()
         {
             int y = Evento1.motion.y;
 
-            if (y > 170 && y < 220)
+            if ( y > f->calcularProporcion(170, 'h') && y < f->calcularProporcion(220, 'h') )
             {
                 PantallaInicio::opcionMenu = 1;
             }
-            else if (y > 250 && y < 300)
+            else if ( y > f->calcularProporcion(250, 'h') && y < f->calcularProporcion(300, 'h') )
             {
                 PantallaInicio::opcionMenu = 2;
             }
-            else if (y > 320 && y < 370)
+            else if ( y > f->calcularProporcion(320, 'h') && y < f->calcularProporcion(370, 'h') )
             {
                 PantallaInicio::opcionMenu = 3;
             }
-            else if (y > 390 && y < 430)
+            else if ( y > f->calcularProporcion(390, 'h') && y < f->calcularProporcion(493, 'h') )
             {
                 PantallaInicio::opcionMenu = 4;
             }

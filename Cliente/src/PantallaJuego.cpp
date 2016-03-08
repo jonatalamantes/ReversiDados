@@ -97,10 +97,10 @@ void PantallaJuego::animacionDado()
     dibujarTablero();
 
     //Dibujamos un cuadrado gris grande en medio de la pantalla
-    rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
-    rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-    rectangulo.w = tamCuadro;
-    rectangulo.h = tamCuadro;
+    rectangulo.x = f->calcularProporcion(((TAM_CUADRO*9)/2)-(tamCuadro/2), 'w');
+    rectangulo.y = f->calcularProporcion(((TAM_CUADRO*12)/2)-(tamCuadro/2), 'h');
+    rectangulo.w = f->calcularProporcion(tamCuadro, 'w');
+    rectangulo.h = f->calcularProporcion(tamCuadro, 'h');
 
     SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
     SDL_RenderFillRect(renderizador, &rectangulo);
@@ -109,12 +109,13 @@ void PantallaJuego::animacionDado()
     SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255); //Blanco
     tamCuadro = 250;
 
-    rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
-    rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
-    rectangulo.w = tamCuadro;
-    rectangulo.h = tamCuadro;
+    rectangulo.x = f->calcularProporcion(((TAM_CUADRO*9)/2)-(tamCuadro/2), 'w');
+    rectangulo.y = f->calcularProporcion(((TAM_CUADRO*12)/2)-(tamCuadro/2), 'h');
+    rectangulo.w = f->calcularProporcion(tamCuadro, 'w');
+    rectangulo.h = f->calcularProporcion(tamCuadro, 'h');
 
     SDL_RenderFillRect(renderizador, &rectangulo);
+    SDL_Rect past = rectangulo;
 
     //Establecemos las variables para el tiempo
     double tiempo = SDL_GetTicks();
@@ -153,9 +154,11 @@ void PantallaJuego::animacionDado()
         //Imprimimos un punto si han pasado 75 milisegundos
         if (tiempo - ptiempo > 75)
         {
+            SDL_RenderFillRect(renderizador, &past);
+
             //Cargamos la imagen en relacion del numero del 1-5
             string cad = "img/animacionDado";
-            cad = cad + fx.intToStr((i % 5) + 1) + ".bmp";
+            cad = cad + fx.intToStr((i % 5) + 1) + ".png";
 
             tex = f->cargarTextura(cad, renderizador);
 
@@ -164,7 +167,7 @@ void PantallaJuego::animacionDado()
             rectangulo.w = tamCuadro/2;
             rectangulo.h = tamCuadro/2;
 
-            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
                                  rectangulo.w, rectangulo.h);
 
             rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
@@ -172,7 +175,7 @@ void PantallaJuego::animacionDado()
             rectangulo.w = tamCuadro/2;
             rectangulo.h = tamCuadro/2;
 
-            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
                                  rectangulo.w, rectangulo.h);
 
             rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
@@ -180,7 +183,7 @@ void PantallaJuego::animacionDado()
             rectangulo.w = tamCuadro/2;
             rectangulo.h = tamCuadro/2;
 
-            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y, 
+            f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
                                  rectangulo.w, rectangulo.h);
 
             SDL_DestroyTexture(tex);
@@ -366,10 +369,10 @@ void PantallaJuego::dibujarTablero()
     {
         for (int j = iniY; j < maxY; j++)
         {
-            rectangulo.x = TAM_CUADRO*i;
-            rectangulo.y = TAM_CUADRO*j;
-            rectangulo.w = (TAM_CUADRO*maxX)-(TAM_CUADRO*i);
-            rectangulo.h = (TAM_CUADRO*maxY)-(TAM_CUADRO*j);
+            rectangulo.x = f->calcularProporcion(TAM_CUADRO*i, 'w');
+            rectangulo.y = f->calcularProporcion(TAM_CUADRO*j, 'h');
+            rectangulo.w = f->calcularProporcion((TAM_CUADRO*maxX)-(TAM_CUADRO*i), 'w');
+            rectangulo.h = f->calcularProporcion((TAM_CUADRO*maxY)-(TAM_CUADRO*j), 'h');
 
             SDL_RenderFillRect(renderizador, &rectangulo);
         }
@@ -386,10 +389,10 @@ void PantallaJuego::dibujarTablero()
     {
         for (int j = iniY; j < maxY; j++)
         {
-            rectangulo.x = TAM_CUADRO*i;
-            rectangulo.y = TAM_CUADRO*j;
-            rectangulo.w = (TAM_CUADRO*maxX)-(TAM_CUADRO*i);
-            rectangulo.h = (TAM_CUADRO*maxY)-(TAM_CUADRO*j);
+            rectangulo.x = f->calcularProporcion(TAM_CUADRO*i, 'w');
+            rectangulo.y = f->calcularProporcion(TAM_CUADRO*j, 'h');
+            rectangulo.w = f->calcularProporcion((TAM_CUADRO*maxX)-(TAM_CUADRO*i), 'w');
+            rectangulo.h = f->calcularProporcion((TAM_CUADRO*maxY)-(TAM_CUADRO*j), 'h');
 
             SDL_RenderFillRect(renderizador, &rectangulo);
         }
@@ -400,23 +403,23 @@ void PantallaJuego::dibujarTablero()
 
     for (int i = 0; i < TAM_CUADRO*9; i+=TAM_CUADRO)
     {
-        rectangulo.x = i;
-        rectangulo.y = TAM_CUADRO*2;
-        rectangulo.w = TAM_LINEA;
-        rectangulo.h = (TAM_CUADRO*12)-(TAM_CUADRO*3);
+        rectangulo.x = f->calcularProporcion(i, 'w');
+        rectangulo.y = f->calcularProporcion(TAM_CUADRO*2, 'h');
+        rectangulo.w = f->calcularProporcion(TAM_LINEA, 'w');
+        rectangulo.h = f->calcularProporcion((TAM_CUADRO*12)-(TAM_CUADRO*3), 'h');
 
         SDL_RenderFillRect(renderizador, &rectangulo);
     }
 
-    rectangulo.x = TAM_CUADRO*9;
+    rectangulo.x = f->calcularProporcion(TAM_CUADRO*9, 'w');
     SDL_RenderFillRect(renderizador, &rectangulo);
 
     for (int i = TAM_CUADRO*2; i < TAM_CUADRO*12; i+=TAM_CUADRO)
     {
-        rectangulo.x = 0;
-        rectangulo.y = i;
-        rectangulo.w = (TAM_CUADRO*9)+TAM_LINEA;
-        rectangulo.h = TAM_LINEA;
+        rectangulo.x = f->calcularProporcion(0, 'w');
+        rectangulo.y = f->calcularProporcion(i, 'h');
+        rectangulo.w = f->calcularProporcion((TAM_CUADRO*9)+TAM_LINEA, 'w');
+        rectangulo.h = f->calcularProporcion(TAM_LINEA, 'h');
 
         SDL_RenderFillRect(renderizador, &rectangulo);
     }
@@ -438,31 +441,31 @@ void PantallaJuego::dibujarTablero()
     //Escribe nombre Jugadores
     if (PantallaJuego::turnoJugador == PantallaJuego::colorJugador)
     {
-        tex = f->cargarTextura("img/btnJugadorA.bmp", renderizador);
+        tex = f->cargarTextura("img/btnJugadorA.png", renderizador);
         f->renderizarTextura(tex, renderizador, 5, 3);
         SDL_DestroyTexture(tex);
 
-        tex = f->cargarTextura("img/btnJugadorB.bmp", renderizador);
+        tex = f->cargarTextura("img/btnJugadorB.png", renderizador);
         f->renderizarTextura(tex, renderizador, 5, TAM_CUADRO+3);
         SDL_DestroyTexture(tex);
     }
     else
     {
-        tex = f->cargarTextura("img/btnJugadorB.bmp", renderizador);
+        tex = f->cargarTextura("img/btnJugadorB.png", renderizador);
         f->renderizarTextura(tex, renderizador, 5, 3);
         SDL_DestroyTexture(tex);
 
-        tex = f->cargarTextura("img/btnJugadorA.bmp", renderizador);
+        tex = f->cargarTextura("img/btnJugadorA.png", renderizador);
         f->renderizarTextura(tex, renderizador, 5, TAM_CUADRO+3);
         SDL_DestroyTexture(tex);
     }
 
-    tex = f->renderizarTexto("Jugador A: " + nombreJugador1, "HelveticaStandar", 
+    tex = f->renderizarTexto("Jugador A: " + nombreJugador1, "HelveticaStandar",
                              color, 16, renderizador);
     f->renderizarTextura(tex, renderizador, 25, 0);
     SDL_DestroyTexture(tex);
 
-    tex = f->renderizarTexto("Jugador B: " + nombreJugador2, "HelveticaStandar", 
+    tex = f->renderizarTexto("Jugador B: " + nombreJugador2, "HelveticaStandar",
                              color, 16, renderizador);
     f->renderizarTextura(tex, renderizador, 25, TAM_CUADRO);
     SDL_DestroyTexture(tex);
@@ -476,13 +479,13 @@ void PantallaJuego::dibujarTablero()
 
         if (dado == 0)
         {
-            tex = f->cargarTextura("img/octagonoVacio.bmp", renderizador);
+            tex = f->cargarTextura("img/octagonoVacio.png", renderizador);
             f->renderizarTextura(tex, renderizador, TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
             SDL_DestroyTexture(tex);
         }
         else
         {
-            tex = f->cargarTextura("img/octagonoLleno.bmp", renderizador);
+            tex = f->cargarTextura("img/octagonoLleno.png", renderizador);
             f->renderizarTextura(tex, renderizador, TAM_CUADRO*(6+i)-10, TAM_CUADRO/2);
             SDL_DestroyTexture(tex);
 
@@ -495,7 +498,7 @@ void PantallaJuego::dibujarTablero()
     //Boton de abajo
     if (Fin)
     {
-        tex = f->cargarTextura("img/btnOn.bmp", renderizador);
+        tex = f->cargarTextura("img/btnOn.png", renderizador);
         f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
         SDL_DestroyTexture(tex);
 
@@ -507,7 +510,7 @@ void PantallaJuego::dibujarTablero()
     {
         if (not dadosSet && (turnoJugador == colorJugador))
         {
-            tex = f->cargarTextura("img/btnOn.bmp", renderizador);
+            tex = f->cargarTextura("img/btnOn.png", renderizador);
             f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
             SDL_DestroyTexture(tex);
 
@@ -517,7 +520,7 @@ void PantallaJuego::dibujarTablero()
         }
         else
         {
-            tex = f->cargarTextura("img/btnOff.bmp", renderizador);
+            tex = f->cargarTextura("img/btnOff.png", renderizador);
             f->renderizarTextura(tex, renderizador, TAM_CUADRO*6+10, TAM_CUADRO*11+10);
             SDL_DestroyTexture(tex);
         }
@@ -663,23 +666,28 @@ void PantallaJuego::dibujarReversiChan(int estado)
     SDL_Color color;
     SDL_SetRenderDrawColor(renderizador, 50, 50, 50, 255); //Blanco
 
-    rectangulo.x = 90;
-    rectangulo.y = 110;
-    rectangulo.w = 170;
-    rectangulo.h = 255;
+    rectangulo.x = f->calcularProporcion(90, 'w');
+    rectangulo.y = f->calcularProporcion(110, 'h');
+    rectangulo.w = f->calcularProporcion(170, 'w');
+    rectangulo.h = f->calcularProporcion(255, 'h');
 
     SDL_RenderFillRect(renderizador, &rectangulo);
 
     //Color interno de la miniventana
     SDL_SetRenderDrawColor(renderizador, 255, 150, 0, 255); //Naranja
 
+    rectangulo.x = f->calcularProporcion(100, 'w');
+    rectangulo.y = f->calcularProporcion(120, 'h');
+    rectangulo.w = f->calcularProporcion(150, 'w');
+    rectangulo.h = f->calcularProporcion(235, 'h');
+
+    SDL_RenderFillRect(renderizador, &rectangulo);
+    SDL_Texture* tex;
+
     rectangulo.x = 100;
     rectangulo.y = 120;
     rectangulo.w = 150;
     rectangulo.h = 235;
-
-    SDL_RenderFillRect(renderizador, &rectangulo);
-    SDL_Texture* tex;
 
     color.r = 255;
     color.g = 255;
@@ -1222,8 +1230,10 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                 int y = Evento.button.y;
                 int x = Evento.button.x;
 
-                if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
-                    x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                if (x > f->calcularProporcion(TAM_CUADRO*6+10, 'w') &&
+                    y > f->calcularProporcion(TAM_CUADRO*11+10, 'h') &&
+                    x < f->calcularProporcion(TAM_CUADRO*6+110, 'w') &&
+                    y < f->calcularProporcion(TAM_CUADRO*11+43, 'h'))
                 {
                     endgame = true;
                 }
@@ -1251,8 +1261,8 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                         int y = Evento.button.y;
                         int x = Evento.button.x;
 
-                        int tabY = ((y/TAM_CUADRO) - 2);
-                        int tabX = ((x/TAM_CUADRO) - 0);
+                        int tabY = ((y/f->calcularProporcion(TAM_CUADRO, 'h')) - 2);
+                        int tabX = ((x/f->calcularProporcion(TAM_CUADRO, 'w')) - 0);
 
                         //Revisamos si la posicion donde esta es un movimiento valido
                         if (tabX > 0 and tabY <= 8 and tabY > 0 and tabY <= 8)
@@ -1286,8 +1296,10 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
-                            x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                        if (x > f->calcularProporcion(TAM_CUADRO*6+10, 'w') &&
+                            y > f->calcularProporcion(TAM_CUADRO*11+10, 'h') &&
+                            x < f->calcularProporcion(TAM_CUADRO*6+110, 'w') &&
+                            y < f->calcularProporcion(TAM_CUADRO*11+43, 'h'))
                         {
                             cl->armarPaquetePedirDado(PantallaJuego::colorJugador);
 
@@ -1301,8 +1313,8 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                     {
                         if (turnoJugador == colorJugador) //Turno Jugador Blancas
                         {
-                            int tabY = ((y/TAM_CUADRO) - 2);
-                            int tabX = ((x/TAM_CUADRO) - 0);
+                            int tabY = ((y/f->calcularProporcion(TAM_CUADRO, 'h')) - 2);
+                            int tabX = ((x/f->calcularProporcion(TAM_CUADRO, 'w')) - 0);
 
                             //Validacion de movimiento en el tablero
                             if (tabX > 0 and tabY <= 8 and tabY > 0 and tabY <= 8)
@@ -1474,8 +1486,8 @@ void PantallaJuego::gestionarEventos()
                         int y = Evento.button.y;
                         int x = Evento.button.x;
 
-                        int tabY = ((y/TAM_CUADRO) - 2);
-                        int tabX = ((x/TAM_CUADRO) - 0);
+                        int tabY = ((y/f->calcularProporcion(TAM_CUADRO, 'h')) - 2);
+                        int tabX = ((x/f->calcularProporcion(TAM_CUADRO, 'w')) - 0);
 
                         //Revisamos si la posicion donde esta es un movimiento valido
                         if (tabX > 0 and tabY <= 8 and tabY > 0 and tabY <= 8)
@@ -1509,8 +1521,10 @@ void PantallaJuego::gestionarEventos()
 
                     if (!dadosSet) //Tirar Dado
                     {
-                        if (x > TAM_CUADRO*6+10 && y > TAM_CUADRO*11+10 &&
-                            x < TAM_CUADRO*6+110 && y < TAM_CUADRO*11+43)
+                        if (x > f->calcularProporcion(TAM_CUADRO*6+10, 'w') &&
+                            y > f->calcularProporcion(TAM_CUADRO*11+10, 'h') &&
+                            x < f->calcularProporcion(TAM_CUADRO*6+110, 'w') &&
+                            y < f->calcularProporcion(TAM_CUADRO*11+43, 'h'))
                         {
                             int num = PantallaJuego::tablero.turnoGlobalValido(turnoJugador);
 
@@ -1532,8 +1546,8 @@ void PantallaJuego::gestionarEventos()
                     {
                         if (PantallaJuego::turnoJugador == colorJugador) //Turno Jugador
                         {
-                            int tabY = ((y/TAM_CUADRO) - 2);
-                            int tabX = ((x/TAM_CUADRO) - 0);
+                            int tabY = ((y/f->calcularProporcion(TAM_CUADRO, 'h')) - 2);
+                            int tabX = ((x/f->calcularProporcion(TAM_CUADRO, 'w')) - 0);
 
                             //Validacion de movimiento en el tablero
                             if (tabX > 0 and tabY <= 8 and tabY > 0 and tabY <= 8)
