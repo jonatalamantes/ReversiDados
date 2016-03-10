@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_net.h>
 #include "Constantes.h"
 #include "FuncionesPantalla.h"
 #include "PantallaConfiguracion.h"
@@ -49,6 +50,13 @@ void Principal::jugar()
         exit(1);
     }
 
+    if(SDLNet_Init() != 0)
+    {
+        printf("SDL_Init: %s\n", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+
     //Create window
     window = SDL_CreateWindow("Reversi",
                                SDL_WINDOWPOS_UNDEFINED,
@@ -65,7 +73,7 @@ void Principal::jugar()
 
     f = new FuncionesPantalla(window);
 
-    SDL_Surface* icono = IMG_Load((f->getPath() + "img/ReversiChan7.png").c_str());
+    SDL_Surface* icono = IMG_Load((f->getPath() + "img/icono.png").c_str());
     SDL_SetWindowIcon(window, icono);
 
     SDL_Renderer *ren = SDL_CreateRenderer(window, -1,

@@ -4,29 +4,22 @@
 #include <cstring>
 #include <cerrno>
 #include <cstdlib>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <sys/socket.h>
 
 #include "Cliente.h"
 #include "List.h"
+#include "stringConvert.h"
 
 using namespace std;
 
 ///Constructor
 Cliente::Cliente()
 {
-    memset(&serv,0,sizeof(serv));
     memset(&clien,0,sizeof(clien));
-    sin_size=sizeof(struct sockaddr);
-    sock = 0;
 }
 
 /**
  * Devuelve el resultado de la conexión, ya sea si esta fue exitosa o no
- * 
+ *
  * @param   host    Recibe una cadeba con el nombre o IP del host donde se hospeda el servidor
  * @param   puerto  Recibe una cadeba con el número de puerto donde se hospeda el servidor
  * @return          Si se logro la conexión
@@ -35,40 +28,31 @@ Cliente::Cliente()
 bool Cliente::conectar(std::string host, std::string puerto)
 {
     int errores;
-    struct addrinfo hints,*res;
+    IPaddress ip;
+    stringConvert ss;
 
-    memset(&hints,0,sizeof(hints));
+    errores = SDLNet_ResolveHost(&ip, host.c_str(), ss.strToInt(puerto));
 
-    hints.ai_flags=AI_PASSIVE;
-    hints.ai_family=AF_UNSPEC;
-    hints.ai_socktype=SOCK_STREAM;
-
-    errores=getaddrinfo(host.c_str(),puerto.c_str(),&hints,&res);
-    if (errores<0)
+    if (errores != 0)
     {
-        perror("Error: getaddrinfo");
+        printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
         return false;
     }
 
-    Cliente::sock=socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if (Cliente::sock<0)
+    clien = SDLNet_TCP_Open(&ip);
+
+    if(clien == NULL)
     {
-        perror("Error: socket");
+        printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
         return false;
     }
-    errores=connect(Cliente::sock, res->ai_addr, res->ai_addrlen);
-    if (errores<0)
-    {
-        perror("Error: connect");
-        return false;
-    }
-    else
-        return true;
+
+    return true;
 }
 
 /**
  * Arma el paquete a ser enviado para buscar una partida
- * 
+ *
  * @param   nombreJ Cadena de caracteres con el nombre del jugador
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
@@ -79,12 +63,12 @@ void Cliente::armarPaqueteBuscar(std::string nombreJ)
     uint8_t u8;
 
     /*Asignación de variables*/
-    Cliente::qJ.RV=21078;//0101001001010110 Firma del protocolo
+    Cliente::qJ.RV=22098;//0101011001010010 Firma del protocolo
     Cliente::qJ.banderas=128;//1000 0000 Bandera Quiero Jugar
     Cliente::qJ.nombre=nombreJ;
 
     /*Copia de variables al paquete*/
-    u16 = htons(Cliente::qJ.RV);
+    u16 = Cliente::qJ.RV;
     memcpy(Cliente::paqueteJugar+0, &u16, 2);
     u8 = Cliente::qJ.banderas;
     memcpy(Cliente::paqueteJugar+2, &u8, 1);
@@ -96,15 +80,17 @@ void Cliente::armarPaqueteBuscar(std::string nombreJ)
 }
 
 /**
- * Devuelve el resultado del envío del paquete de busqueda de un juego 
- * 
+ * Devuelve el resultado del envío del paquete de busqueda de un juego
+ *
  * @return          Si se ha enviado el paquete correctamente
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
 bool Cliente::enviarBusquedaDeJuego()
 {
     int errores;
-    errores=send(Cliente::sock,paqueteJugar,sizeof(paqueteJugar),0);
+
+    errores = SDLNet_TCP_Send(Cliente::clien, paqueteJugar, sizeof(paqueteJugar));
+
     if(errores<0)
     {
         perror("Error: send");
@@ -116,7 +102,7 @@ bool Cliente::enviarBusquedaDeJuego()
 
 /**
  * Arma el paquete a ser enviado por cada movimiento del jugador
- * 
+ *
  * @param   x   Coordenada x del movimiento que fue realizado por el jugador
  * @param   y   Coordenada y del movimiento que fue realizado por el jugador
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
@@ -127,7 +113,7 @@ void Cliente::armarPaqueteMovimiento(int x,int y)
     uint16_t u16;
 
     /*Asignación de variables*/
-    Cliente::m.RV=21078;//0101001zz001010110 Firma del protocolo
+    Cliente::m.RV=22098;//0101011001010010 Firma del protocolo
     Cliente::m.banderas=64;
 
     uint8_t x1 = x;
@@ -138,7 +124,7 @@ void Cliente::armarPaqueteMovimiento(int x,int y)
     Cliente::m.xy= x1 | x2;
 
     /*Copia de variables al paquete*/
-    u16 = htons(Cliente::m.RV);
+    u16 = Cliente::m.RV;
     memcpy(Cliente::paqueteMovimiento+0, &u16, 2);
     memcpy(Cliente::paqueteMovimiento+2, &Cliente::m.banderas, 1);
     memcpy(Cliente::paqueteMovimiento+3, &Cliente::m.xy, 1);
@@ -146,14 +132,16 @@ void Cliente::armarPaqueteMovimiento(int x,int y)
 
 /**
  * Devuelve el resultado del envío del paquete que contiene el movimiento realizado por el jugador
- * 
+ *
  * @return          Si se ha enviado el paquete correctamente
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
 bool Cliente::mandarMoviento()
 {
     int errores;
-    errores=send(Cliente::sock,Cliente::paqueteMovimiento,sizeof(Cliente::paqueteMovimiento),0);
+
+    errores = SDLNet_TCP_Send(Cliente::clien, paqueteMovimiento, sizeof(paqueteMovimiento));
+
     if(errores<0)
     {
         perror("Error: send");
@@ -165,7 +153,7 @@ bool Cliente::mandarMoviento()
 
 /**
  * Arma el paquete a ser enviado por cada peticíón un dado por parte del jugador
- * 
+ *
  * @param   colorFicha  Color de la ficha correspondiente al jugador que realiza la petición
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
@@ -176,12 +164,12 @@ void Cliente::armarPaquetePedirDado(int colorFicha)
     uint8_t u8;
 
     /*Asignación de variables*/
-    Cliente::pD.RV=21078;//0101001001010110 Firma del protocolo
+    Cliente::pD.RV=22098;//0101011001010010 Firma del protocolo
     Cliente::pD.banderas=80;//0101 0000 Bandera Pedir Dado
     Cliente::pD.color=colorFicha;
 
     /*Copia de variables al paquete*/
-    u16 = htons(Cliente::pD.RV);
+    u16 = Cliente::pD.RV;
     memcpy(Cliente::paqueteDado+0, &u16, 2);
     u8 = Cliente::pD.banderas;
     memcpy(Cliente::paqueteDado+2, &u8, 1);
@@ -191,14 +179,16 @@ void Cliente::armarPaquetePedirDado(int colorFicha)
 
 /**
  * Devuelve el resultado del envío del paquete de solicitud de dado
- * 
+ *
  * @return          Si se ha enviado el paquete correctamente
  * @author  Luis Fernando Gutiérrez <G.G.LuisFer@gmail.com>
  */
 bool Cliente::pedirDado()
 {
     int errores;
-    errores=send(Cliente::sock,Cliente::paqueteDado,sizeof(Cliente::paqueteDado),0);
+
+    errores = SDLNet_TCP_Send(Cliente::clien, paqueteDado, sizeof(paqueteDado));
+
     if(errores<0)
     {
         perror("Error: send");
@@ -291,7 +281,7 @@ void Cliente::enviarPaqueteFin(int color)
     }
 
     //Enviamos el paquete
-    int resWrite = write(Cliente::sock, bufferPaquete, bytesEnviados.getSize());
+    int resWrite = SDLNet_TCP_Send(Cliente::clien, bufferPaquete, bytesEnviados.getSize());
 
     if (resWrite < 0)
     {
@@ -303,7 +293,7 @@ void Cliente::enviarPaqueteFin(int color)
 }
 
 /// Getter
-int Cliente::getSock()
+TCPsocket* Cliente::getCliente()
 {
-    return Cliente::sock;
+    return &clien;
 }

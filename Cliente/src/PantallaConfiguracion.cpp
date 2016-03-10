@@ -312,14 +312,17 @@ void PantallaConfiguracion::imprimirPantalla()
 
             if (y > f->calcularProporcion(180, 'h') && y < f->calcularProporcion(260, 'h'))
             {
+                SDL_StartTextInput();
                 PantallaConfiguracion::opcionMenu = 1;
             }
             else if (y > f->calcularProporcion(260, 'h') && y < f->calcularProporcion(340, 'h'))
             {
+                SDL_StartTextInput();
                 PantallaConfiguracion::opcionMenu = 2;
             }
             else if (y > f->calcularProporcion(340, 'h') && y < f->calcularProporcion(405, 'h'))
             {
+                SDL_StartTextInput();
                 PantallaConfiguracion::opcionMenu = 3;
             }
             else if (y > f->calcularProporcion(405, 'h'))
@@ -336,6 +339,12 @@ void PantallaConfiguracion::imprimirPantalla()
                 if (PantallaConfiguracion::opcionMenu == 4)
                 {
                     Fin = true;
+                }
+                else
+                {
+                    int opcion = PantallaConfiguracion::opcionMenu % 4;
+                    opcion++;
+                    PantallaConfiguracion::opcionMenu = opcion;
                 }
             }
             else if (Evento.key.keysym.sym == SDLK_UP) //Boton Arriba
@@ -389,6 +398,10 @@ void PantallaConfiguracion::imprimirPantalla()
                     puerto = puerto.substr(0, puerto.size()-1);
                 }
             }
+            else if (Evento.key.keysym.sym == SDLK_AC_BACK)
+            {
+                Fin = true;
+            }
         }
         else if (Evento.type == SDL_TEXTINPUT)
         {
@@ -425,4 +438,3 @@ void PantallaConfiguracion::imprimirPantalla()
 
     SDL_StopTextInput();
 }
-

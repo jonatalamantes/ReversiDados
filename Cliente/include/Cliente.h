@@ -7,18 +7,7 @@
 #include <cstring>
 #include <cerrno>
 #include <cstdlib>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/time.h>
-#include <csignal>
-#include <sys/poll.h>
-
+#include <SDL2/SDL_net.h>
 #include "Tablero.h"
 
 struct quieroJugar
@@ -51,10 +40,7 @@ class Cliente
         char paqueteJugar[19];
         char paqueteMovimiento[4];
         char paqueteDado[6];
-        int sock;
-        struct sockaddr_in serv;
-        struct sockaddr_in clien;
-        socklen_t sin_size;
+        TCPsocket clien;
 
     public:
         Cliente();
@@ -71,7 +57,7 @@ class Cliente
         void recibirPaquete();
         void enviarPaqueteFin(int color);
 
-        int getSock();
+        TCPsocket* getCliente();
 };
 
 #endif // CLIENTE_H

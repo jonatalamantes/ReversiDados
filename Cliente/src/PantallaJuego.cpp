@@ -102,6 +102,8 @@ void PantallaJuego::animacionDado()
     rectangulo.w = f->calcularProporcion(tamCuadro, 'w');
     rectangulo.h = f->calcularProporcion(tamCuadro, 'h');
 
+    SDL_Rect past2 = rectangulo;
+
     SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
     SDL_RenderFillRect(renderizador, &rectangulo);
 
@@ -154,6 +156,10 @@ void PantallaJuego::animacionDado()
         //Imprimimos un punto si han pasado 75 milisegundos
         if (tiempo - ptiempo > 75)
         {
+            SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
+            SDL_RenderFillRect(renderizador, &past2);
+
+            SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255); //Gris
             SDL_RenderFillRect(renderizador, &past);
 
             //Cargamos la imagen en relacion del numero del 1-5
@@ -199,8 +205,46 @@ void PantallaJuego::animacionDado()
         }
     }
 
-    if (not Fin)
+    if (not Fin || terminar)
     {
+        SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
+        SDL_RenderFillRect(renderizador, &past2);
+
+        SDL_SetRenderDrawColor(renderizador, 255, 255, 255, 255); //Gris
+        SDL_RenderFillRect(renderizador, &past);
+
+        //Cargamos la imagen en relacion del numero del 1-5
+        string cad = "img/animacionDado1.png";
+
+        SDL_Texture* tex = f->cargarTextura(cad, renderizador);
+
+        rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+        rectangulo.w = tamCuadro/2;
+        rectangulo.h = tamCuadro/2;
+
+        f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
+                             rectangulo.w, rectangulo.h);
+
+        rectangulo.x = ((TAM_CUADRO*9)/2)+62-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)+125-(tamCuadro/2);
+        rectangulo.w = tamCuadro/2;
+        rectangulo.h = tamCuadro/2;
+
+        f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
+                             rectangulo.w, rectangulo.h);
+
+        rectangulo.x = ((TAM_CUADRO*9)/2)-(tamCuadro/2);
+        rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
+        rectangulo.w = tamCuadro/2;
+        rectangulo.h = tamCuadro/2;
+
+        f->renderizarTextura(tex, renderizador, rectangulo.x, rectangulo.y,
+                             rectangulo.w, rectangulo.h);
+
+        SDL_DestroyTexture(tex);
+        SDL_RenderPresent(renderizador);
+
         //Cargamos el dado y ponemos el numero
         rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
         rectangulo.y = ((TAM_CUADRO*12)/2)-(tamCuadro/2);
@@ -597,9 +641,6 @@ void PantallaJuego::dibujarTablero()
         f->cargarFicha(renderizador, posibleX, posibleY, 'G', "0");
     }
 
-    //Actualizamos la superficie del tablero
-    SDL_RenderPresent(renderizador);
-
     if (Fin)
     {
         if (cnn == cbn)
@@ -651,6 +692,8 @@ void PantallaJuego::dibujarTablero()
             dibujarReversiChan(7);
         }
     }
+
+    SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -808,7 +851,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
         SDL_DestroyTexture(tex);
     }
 
-    SDL_RenderPresent(renderizador);
+    //SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -819,6 +862,7 @@ void PantallaJuego::dibujarReversiChan(int estado)
 void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
 {
     Cliente *cl = new Cliente();
+    bool iniciaJuego = false;
 
     if (pc->getHost() == "" || pc->getPuerto() == "0")
     {
@@ -826,6 +870,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
     }
 
     inicializar();
+    SDLNet_SocketSet setSocket = SDLNet_AllocSocketSet(1);;
 
     if (cl->conectar(pc->getHost(),pc->getPuerto()))
     {
@@ -834,9 +879,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
         cl->enviarBusquedaDeJuego();
 
         //Creamos la estructura del Poll
-        struct pollfd revisar;
-        revisar.fd = cl->getSock();
-        revisar.events = POLLIN;
+        SDLNet_TCP_AddSocket(setSocket, *(cl->getCliente()));
 
         //Establecemos las variables para el tiempo
         int n, res;
@@ -845,7 +888,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
         double ptiempo = tiempo;
 
         int contador = 0;
-        bool animar = true, iniciaJuego = false;
+        bool animar = true;
 
         SDL_Event e;
 
@@ -857,6 +900,13 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
             if (e.type == SDL_QUIT)
             {
                 break;
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_AC_BACK)
+                {
+                    break;
+                }
             }
 
             //Transformamos a un número doble la hora
@@ -881,6 +931,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
                         dibujarReversiChan(3);
                     }
 
+                    SDL_RenderPresent(renderizador);
                     ptiempo = tiempo;
                     contador++;
 
@@ -893,7 +944,7 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
             }
 
             //Llamamos a poll para revisar si tenemos un evento en 50 milisegundos
-            n = poll(&revisar, 1, 50);
+            n = SDLNet_CheckSockets(setSocket, 50);
 
             if (n < 0)
             {
@@ -901,87 +952,77 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
             }
             else if (n > 0)
             {
-                if ((revisar.revents & POLLERR) == POLLERR)
-                {
-                    //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
-                }
-                else if ((revisar.revents & POLLHUP) == POLLHUP)
-                {
-                    //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
-                }
-                else if ((revisar.revents & POLLIN) == POLLIN)
-                {
-                    //Leemos los datos del socket
-                    char buffer[256];
-                    memset(buffer, 0, 256);
+                //Leemos los datos del socket
+                char buffer[256];
+                memset(buffer, 0, 256);
 
-                    res = read(cl->getSock(), buffer, 255);
+                res = SDLNet_TCP_Recv(*(cl->getCliente()), buffer, 255);
 
-                    if (res < 0)
+                if (res < 0)
+                {
+                    if (errno != EAGAIN && errno != EWOULDBLOCK)
                     {
-                        if (errno != EAGAIN && errno != EWOULDBLOCK)
-                        {
-                            //cerr<< "Error al llamar a read: \"" <<  strerror(errno) << "\"" << endl;
-                        }
-                        else
-                        {
-                            //cerr<< "Tendra que internarlo más tarde" << endl;
-                        }
-                    }
-                    else if (res == 0)
-                    {
-                        //cout << endl << "Cerrando la conexion" << endl;
-                        animar = false;
-                        iniciaJuego = false;
+                        //cerr<< "Error al llamar a read: \"" <<  strerror(errno) << "\"" << endl;
                     }
                     else
                     {
-                        if(cl->recibirPaquete(buffer)==1)
-                        {
-                            uint8_t colorF=buffer[3];
-                            string nombreVersus;
-                            for(int i=4;i<20;i++)
-                            {
-                                nombreVersus.push_back(buffer[i]);
-                            }
-
-                            //string  nombreVersus=string(nombreversus);
-                            if(colorF == 0)
-                            {
-                                //Color del jugador blancas, inicia blancas
-                                PantallaJuego::colorJugador=-1;
-                                PantallaJuego::turnoJugador=-1;
-                                PantallaJuego::setNombreJugador1(pc->getNombreJugador());
-                                PantallaJuego::setNombreJugador2(nombreVersus);
-                            }
-                            else if(colorF == 1)
-                            {
-                                //Color del jugador blancas, inicia negras
-                                PantallaJuego::colorJugador=-1;
-                                PantallaJuego::turnoJugador=1;
-                                PantallaJuego::setNombreJugador1(pc->getNombreJugador());
-                                PantallaJuego::setNombreJugador2(nombreVersus);
-                            }
-                            else if(colorF == 16)
-                            {
-                                //Color del jugador negas, inicia blancas
-                                PantallaJuego::colorJugador=1;
-                                PantallaJuego::turnoJugador=-1;
-                                PantallaJuego::setNombreJugador1(pc->getNombreJugador());
-                                PantallaJuego::setNombreJugador2(nombreVersus);
-                            }
-                            else if(colorF == 17)
-                            {
-                                //Color del jugador negras, inicia negras
-                                PantallaJuego::colorJugador=1;
-                                PantallaJuego::turnoJugador=1;
-                                PantallaJuego::setNombreJugador1(pc->getNombreJugador());
-                                PantallaJuego::setNombreJugador2(nombreVersus);
-                            }
-                        }
-                        animar = false;
-                        iniciaJuego = true;
+                        //cerr<< "Tendra que internarlo más tarde" << endl;
                     }
+                }
+                else if (res == 0)
+                {
+                    //cout << endl << "Cerrando la conexion" << endl;
+                    animar = false;
+                    iniciaJuego = false;
+                }
+                else
+                {
+                    if(cl->recibirPaquete(buffer)==1)
+                    {
+                        uint8_t colorF=buffer[3];
+                        string nombreVersus;
+                        for(int i=4;i<20;i++)
+                        {
+                            nombreVersus.push_back(buffer[i]);
+                        }
+
+                        //string  nombreVersus=string(nombreversus);
+                        if(colorF == 0)
+                        {
+                            //Color del jugador blancas, inicia blancas
+                            PantallaJuego::colorJugador=-1;
+                            PantallaJuego::turnoJugador=-1;
+                            PantallaJuego::setNombreJugador1(pc->getNombreJugador());
+                            PantallaJuego::setNombreJugador2(nombreVersus);
+                        }
+                        else if(colorF == 1)
+                        {
+                            //Color del jugador blancas, inicia negras
+                            PantallaJuego::colorJugador=-1;
+                            PantallaJuego::turnoJugador=1;
+                            PantallaJuego::setNombreJugador1(pc->getNombreJugador());
+                            PantallaJuego::setNombreJugador2(nombreVersus);
+                        }
+                        else if(colorF == 16)
+                        {
+                            //Color del jugador negas, inicia blancas
+                            PantallaJuego::colorJugador=1;
+                            PantallaJuego::turnoJugador=-1;
+                            PantallaJuego::setNombreJugador1(pc->getNombreJugador());
+                            PantallaJuego::setNombreJugador2(nombreVersus);
+                        }
+                        else if(colorF == 17)
+                        {
+                            //Color del jugador negras, inicia negras
+                            PantallaJuego::colorJugador=1;
+                            PantallaJuego::turnoJugador=1;
+                            PantallaJuego::setNombreJugador1(pc->getNombreJugador());
+                            PantallaJuego::setNombreJugador2(nombreVersus);
+                        }
+                    }
+
+                    animar = false;
+                    iniciaJuego = true;
                 }
             }
         }
@@ -994,14 +1035,18 @@ void PantallaJuego::jugarRed(PantallaConfiguracion* pc)
         else
         {
             //Cerramos la conexion
-            close(cl->getSock());
+            SDLNet_TCP_Close(*(cl->getCliente()));
 
             dibujarReversiChan(4);
-            SDL_Delay(3000);
+            SDL_RenderPresent(renderizador);
+            SDL_Delay(2500);
         }
     }
     else
     {
+        dibujarReversiChan(4);
+        SDL_RenderPresent(renderizador);
+        SDL_Delay(2500);
         pc->setPuerto("0");
     }
 }
@@ -1023,26 +1068,25 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
     int n,res;
 
     //Poll para jugar
-    struct pollfd revisar;
-    revisar.fd = cl->getSock();
-    revisar.events = POLLIN | POLLRDNORM;
-
-    dibujarTablero();
+    SDLNet_SocketSet setSocket = SDLNet_AllocSocketSet(1);
+    SDLNet_TCP_AddSocket(setSocket, *(cl->getCliente()));
 
     if (colorJugador != 1)
     {
         dibujarReversiChan(5);
+        SDL_RenderPresent(renderizador);
         SDL_Delay(3000);
     }
     else
     {
         dibujarReversiChan(6);
+        SDL_RenderPresent(renderizador);
         SDL_Delay(3000);
     }
 
     do
     {
-        n = poll(&revisar, 1, 30);
+        n = SDLNet_CheckSockets(setSocket, 30);
 
         if (n < 0)
         {
@@ -1050,169 +1094,158 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
         }
         else if (n > 0)
         {
-            if ((revisar.revents & POLLERR) == POLLERR)
-            {
-                    //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
-            }
-            else if ((revisar.revents & POLLHUP) == POLLHUP)
-            {
-                //cerr<< "Error al llamar a poll: \"" <<  strerror(errno) << "\"" << endl;
-            }
-            else if ((revisar.revents & POLLIN) == POLLIN ||
-                     (revisar.revents & POLLRDNORM) == POLLRDNORM)
-            {
-                //Leemos los datos del socket
-                char buffer[256];
-                memset(buffer, 0, 256);
+            //Leemos los datos del socket
+            char buffer[256];
+            memset(buffer, 0, 256);
 
-                res = read(cl->getSock(), buffer, 255);
+            res = SDLNet_TCP_Recv(*(cl->getCliente()), buffer, 255);
 
-                if (res < 0)
+            if (res < 0)
+            {
+                if (errno != EAGAIN && errno != EWOULDBLOCK)
                 {
-                    if (errno != EAGAIN && errno != EWOULDBLOCK)
-                    {
-                        //cerr<< "Error al llamar a read: \"" <<  strerror(errno) << "\"" << endl;
-                    }
-                    else
-                    {
-                        //cerr<< "Tendra que internarlo más tarde" << endl;
-                    }
-                }
-                else if (res == 0)
-                {
-                    endgame = true;
+                    //cerr<< "Error al llamar a read: \"" <<  strerror(errno) << "\"" << endl;
                 }
                 else
                 {
-                    if(cl->recibirPaquete(buffer)==3)//Dados
+                    //cerr<< "Tendra que internarlo más tarde" << endl;
+                }
+            }
+            else if (res == 0)
+            {
+                endgame = true;
+            }
+            else
+            {
+                if(cl->recibirPaquete(buffer)==3)//Dados
+                {
+                    uint8_t dadoRecividoUno=buffer[3];
+                    tablero.setDado(0,dadoRecividoUno);
+                    uint8_t dadoRecividoDos=buffer[4];
+                    tablero.setDado(1,dadoRecividoDos);
+                    uint8_t dadoRecividoTres=buffer[5];
+                    tablero.setDado(2,dadoRecividoTres);
+
+                    PantallaJuego::animacionDado();
+
+                    //Revision de si hay mas dados por tirar
+                    if (PantallaJuego::tablero.getDado(2) != 0)
                     {
-                        uint8_t dadoRecividoUno=buffer[3];
-                        tablero.setDado(0,dadoRecividoUno);
-                        uint8_t dadoRecividoDos=buffer[4];
-                        tablero.setDado(1,dadoRecividoDos);
-                        uint8_t dadoRecividoTres=buffer[5];
-                        tablero.setDado(2,dadoRecividoTres);
-
-                        PantallaJuego::animacionDado();
-
-                        //Revision de si hay mas dados por tirar
-                        if (PantallaJuego::tablero.getDado(2) != 0)
-                        {
-                            dadosSet = true;
-                        }
-                        else
-                        {
-                            PantallaJuego::turnoJugador = (-1) * PantallaJuego::colorJugador;
-                        }
+                        dadosSet = true;
                     }
-                    else if(cl->recibirPaquete(buffer)==5)//Movimiento Invalido
+                    else
                     {
-                        //cout << "Invalido" << endl;
-                        //cout.flush();
+                        PantallaJuego::turnoJugador = (-1) * PantallaJuego::colorJugador;
                     }
-                    else if(cl->recibirPaquete(buffer)==6)//Movimiento Valido
+                }
+                else if(cl->recibirPaquete(buffer)==5)//Movimiento Invalido
+                {
+                    //cout << "Invalido" << endl;
+                    //cout.flush();
+                }
+                else if(cl->recibirPaquete(buffer)==6)//Movimiento Valido
+                {
+                    uint128_t tableroRecibido;
+                    uint8_t color=buffer[3];
+
+                    for (int j = 0; j < 16; j++)
                     {
-                        uint128_t tableroRecibido;
-                        uint8_t color=buffer[3];
-
-                        for (int j = 0; j < 16; j++)
-                        {
-                            tableroRecibido.byte[j]=buffer[j+4];
-                        }
-
-                        Tablero antes = tablero;
-                        tablero = tablero.bytesToTablero(tableroRecibido);
-
-                        noTurno = true;
-                        PantallaJuego::tablero.inicializarDados();
-
-                        int px, py;
-                        tablero.buscarMovimiento(antes, tablero, colorJugador, &px, &py);
-
-                        posibleX = -1;
-                        posibleY = -1;
-
-                        ponerAnimacion(antes, PantallaJuego::colorJugador, px+1, py+1);
-
-                        if (color != 0)
-                        {
-                            PantallaJuego::turnoJugador = -1;
-                        }
-                        else
-                        {
-                            PantallaJuego::turnoJugador = 1;
-                        }
-
-                        dadosSet = false;
+                        tableroRecibido.byte[j]=buffer[j+4];
                     }
-                    else if(cl->recibirPaquete(buffer)==7) //Fin
+
+                    Tablero antes = tablero;
+                    tablero = tablero.bytesToTablero(tableroRecibido);
+
+                    noTurno = true;
+                    PantallaJuego::tablero.inicializarDados();
+
+                    int px, py;
+                    tablero.buscarMovimiento(antes, tablero, colorJugador, &px, &py);
+
+                    posibleX = -1;
+                    posibleY = -1;
+
+                    ponerAnimacion(antes, PantallaJuego::colorJugador, px+1, py+1);
+
+                    if (color != 0)
                     {
+                        PantallaJuego::turnoJugador = -1;
+                    }
+                    else
+                    {
+                        PantallaJuego::turnoJugador = 1;
+                    }
+
+                    dadosSet = false;
+                }
+                else if(cl->recibirPaquete(buffer)==7) //Fin
+                {
+                    Fin=true;
+                    uint8_t razonFin=buffer[3];
+
+                    if((razonFin & 0x0)==razonFin)//Empate
+                    {
+                        tablas=true;
+                    }
+                    else if((razonFin & 0x1)==razonFin)//Gana Blancas
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                tablero.setFicha(i,j, -1);
+                            }
+                        }
+
+                        tablas=false;
                         Fin=true;
-                        uint8_t razonFin=buffer[3];
-
-                        if((razonFin & 0x0)==razonFin)//Empate
-                        {
-                            tablas=true;
-                        }
-                        else if((razonFin & 0x1)==razonFin)//Gana Blancas
-                        {
-                            for (int i = 0; i < 8; i++)
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    tablero.setFicha(i,j, -1);
-                                }
-                            }
-
-                            tablas=false;
-                            Fin=true;
-                        }
-                        else if((razonFin & 0x2)==razonFin)//Gana Negras
-                        {
-                            for (int i = 0; i < 8; i++)
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    tablero.setFicha(i,j, 1);
-                                }
-                            }
-
-                            tablas=false;
-                            Fin=true;
-                        }
-                        else if((razonFin & 0x3)==razonFin)//Desconexion Blancas
-                        {
-                            for (int i = 0; i < 8; i++)
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    tablero.setFicha(i,j, 1);
-                                }
-                            }
-
-                            tablas=false;
-                            Fin=true;
-                        }
-                        else if((razonFin & 0x4)==razonFin)//Desconexion Negras
-                        {
-                            for (int i = 0; i < 8; i++)
-                            {
-                                for (int j = 0; j < 8; j++)
-                                {
-                                    tablero.setFicha(i,j, -1);
-                                }
-                            }
-
-                            tablas=false;
-                            Fin=true;
-                        }
-
-                        dibujarTablero();
-                        SDL_Delay(3000);
                     }
+                    else if((razonFin & 0x2)==razonFin)//Gana Negras
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                tablero.setFicha(i,j, 1);
+                            }
+                        }
+
+                        tablas=false;
+                        Fin=true;
+                    }
+                    else if((razonFin & 0x3)==razonFin)//Desconexion Blancas
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                tablero.setFicha(i,j, 1);
+                            }
+                        }
+
+                        tablas=false;
+                        Fin=true;
+                    }
+                    else if((razonFin & 0x4)==razonFin)//Desconexion Negras
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                tablero.setFicha(i,j, -1);
+                            }
+                        }
+
+                        tablas=false;
+                        Fin=true;
+                    }
+
+                    dibujarTablero();
+                    SDL_Delay(3000);
                 }
             }
         }
+
 
         if (Fin) //Si hay fin de juego
         {
@@ -1342,11 +1375,18 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
             {
                 cl->enviarPaqueteFin(PantallaJuego::colorJugador);
             }
+            else if (Evento.type == SDL_KEYDOWN) //Salir
+            {
+                if (Evento.key.keysym.sym == SDLK_AC_BACK)
+                {
+                    cl->enviarPaqueteFin(PantallaJuego::colorJugador);
+                }
+            }
         }
 
     }while(!endgame);
 
-    close(cl->getSock());
+    SDLNet_TCP_Close(*(cl->getCliente()));
 }
 
 /**
@@ -1365,17 +1405,17 @@ void PantallaJuego::gestionarEventos()
     dadosSet = false;
     Fin = false;
 
-    dibujarTablero();
-
     if (colorJugador != 1)
     {
         dibujarReversiChan(5);
-        SDL_Delay(3000);
+        SDL_RenderPresent(renderizador);
+        SDL_Delay(2500);
     }
     else
     {
         dibujarReversiChan(6);
-        SDL_Delay(3000);
+        SDL_RenderPresent(renderizador);
+        SDL_Delay(2500);
     }
 
     while (!endgame)
@@ -1590,6 +1630,24 @@ void PantallaJuego::gestionarEventos()
                     SDL_Delay(3000);
 
                     endgame = true;
+                }
+                else if (Evento.type == SDL_KEYDOWN) //Salir
+                {
+                    if (Evento.key.keysym.sym == SDLK_AC_BACK)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                tablero.setFicha(i,j, colorJugador*(-1));
+                            }
+                        }
+
+                        dibujarTablero();
+                        SDL_Delay(3000);
+
+                        endgame = true;
+                    }
                 }
             }
             else //Validamos que se turno valido o haya tablas

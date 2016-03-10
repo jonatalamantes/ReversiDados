@@ -181,6 +181,11 @@ int PantallaInicio::imprimirPantalla()
             {
                 Fin = true;
             }
+            else if (Evento1.key.keysym.sym == SDLK_AC_BACK)
+            {
+                PantallaInicio::opcionMenu = 4;
+                Fin = true;
+            }
             else if (Evento1.key.keysym.sym == SDLK_UP) //Boton Arriba
             {
                 if (PantallaInicio::opcionMenu == 2)

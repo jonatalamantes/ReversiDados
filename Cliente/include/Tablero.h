@@ -1,12 +1,14 @@
 #ifndef TABLERO_H
 #define TABLERO_H
 
+#include <cstdio>
+#include <cerrno>
 #include <string>
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <stdint.h>
+#include <SDL2/SDL_net.h>
 
 using namespace std;
 
