@@ -132,6 +132,8 @@ void PantallaJuego::animacionDado()
 
     while(not terminar && not Fin)
     {
+    	dibujarTablero();
+
         if (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
@@ -207,6 +209,7 @@ void PantallaJuego::animacionDado()
 
     if (not Fin || terminar)
     {
+    	dibujarTablero();
         SDL_SetRenderDrawColor(renderizador, 170, 170, 170, 255); //Gris
         SDL_RenderFillRect(renderizador, &past2);
 
@@ -243,7 +246,6 @@ void PantallaJuego::animacionDado()
                              rectangulo.w, rectangulo.h);
 
         SDL_DestroyTexture(tex);
-        SDL_RenderPresent(renderizador);
 
         //Cargamos el dado y ponemos el numero
         rectangulo.x = ((TAM_CUADRO*9)/2)+125-(tamCuadro/2);
@@ -297,6 +299,7 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
     {
         Fin = true;
         dibujarTablero();
+        SDL_RenderPresent(renderizador);
         SDL_Delay(1000);
 
         if (cnn > cbn)
@@ -321,6 +324,7 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
         }
 
         dibujarTablero();
+        SDL_RenderPresent(renderizador);
     }
     else
     {
@@ -333,6 +337,7 @@ void PantallaJuego::ponerAnimacion(Tablero antiguo, short color, short lastX, sh
 
         //Dibujamos
         dibujarTablero();
+        SDL_RenderPresent(renderizador);
 
         SDL_Delay(1000);
 
@@ -394,12 +399,7 @@ void PantallaJuego::dibujarTablero()
 
     //Rellenamos de negro el tablero
     SDL_SetRenderDrawColor(renderizador, 0, 0, 0, 255); //negro
-    rectangulo.x = 0;
-    rectangulo.y = 0;
-    rectangulo.h = iH;
-    rectangulo.w = iW;
-
-    SDL_RenderFillRect(renderizador, &rectangulo);
+    SDL_RenderClear(renderizador);
 
     //Dibuja la parte cafe del tablero
     iniX = 0;
@@ -692,8 +692,6 @@ void PantallaJuego::dibujarTablero()
             dibujarReversiChan(7);
         }
     }
-
-    SDL_RenderPresent(renderizador);
 }
 
 /**
@@ -1073,12 +1071,14 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
 
     if (colorJugador != 1)
     {
+    	PantallaJuego::dibujarTablero();
         dibujarReversiChan(5);
         SDL_RenderPresent(renderizador);
         SDL_Delay(3000);
     }
     else
     {
+    	PantallaJuego::dibujarTablero();
         dibujarReversiChan(6);
         SDL_RenderPresent(renderizador);
         SDL_Delay(3000);
@@ -1241,6 +1241,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
                     }
 
                     dibujarTablero();
+                    SDL_RenderPresent(renderizador);
                     SDL_Delay(3000);
                 }
             }
@@ -1279,6 +1280,7 @@ void PantallaJuego::gestionarEventosRed(Cliente *clrev)
         else //Hay juego activo
         {
             PantallaJuego::dibujarTablero();
+            SDL_RenderPresent(renderizador);
 
             if (not SDL_PollEvent(&Evento))
             {
@@ -1407,12 +1409,14 @@ void PantallaJuego::gestionarEventos()
 
     if (colorJugador != 1)
     {
+    	PantallaJuego::dibujarTablero();
         dibujarReversiChan(5);
         SDL_RenderPresent(renderizador);
         SDL_Delay(2500);
     }
     else
     {
+    	PantallaJuego::dibujarTablero();
         dibujarReversiChan(6);
         SDL_RenderPresent(renderizador);
         SDL_Delay(2500);
@@ -1422,6 +1426,7 @@ void PantallaJuego::gestionarEventos()
     {
         //Dibujamos el tablero
         PantallaJuego::dibujarTablero();
+        SDL_RenderPresent(renderizador);
 
         if (Fin) //Si hay fin de juego
         {
@@ -1627,6 +1632,7 @@ void PantallaJuego::gestionarEventos()
                     }
 
                     dibujarTablero();
+                    SDL_RenderPresent(renderizador);
                     SDL_Delay(3000);
 
                     endgame = true;
@@ -1644,6 +1650,7 @@ void PantallaJuego::gestionarEventos()
                         }
 
                         dibujarTablero();
+                        SDL_RenderPresent(renderizador);
                         SDL_Delay(3000);
 
                         endgame = true;
